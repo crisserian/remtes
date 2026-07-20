@@ -93,7 +93,7 @@
     </div>
 
     <div class="panel">
-      <div class="panel-title">❄️ Climate</div>
+      <div class="panel-title">❄️ Climatizare</div>
       <div class="temp-box">
         <div class="temp-readout">
           <span>🏠 In: <b id="tempInside">–</b></span>
@@ -106,7 +106,7 @@
         </div>
       </div>
       <div class="grid">
-        <button class="wide toggle-btn" id="toggleClimate" onclick="toggleFeature('climate')">❄️ Climate: –</button>
+        <button class="wide toggle-btn" id="toggleClimate" onclick="toggleFeature('climate')">❄️ Climatizare: –</button>
         <button class="toggle-btn" id="toggleSeat" onclick="toggleFeature('seat')">🔥 Scaun: –</button>
         <button class="toggle-btn" id="toggleSteering" onclick="toggleFeature('steering')">🔥 Volan: –</button>
       </div>
@@ -157,7 +157,7 @@
 </div>
 <script>
 const LABELS = {
-  lock: 'Blocare', unlock: 'Deblocare', climate_on: 'Climate ON', climate_off: 'Climate OFF',
+  lock: 'Blocare', unlock: 'Deblocare', climate_on: 'Climatizare ON', climate_off: 'Climatizare OFF',
   flash: 'Flash faruri', honk: 'Claxon', wake: 'Trezire mașină', vent_windows: 'Deschidere geamuri', close_windows: 'Închidere geamuri',
   charge_start: 'Start încărcare', charge_stop: 'Stop încărcare', charge_port_open: 'Deschidere capac priză', charge_port_close: 'Închidere capac priză',
   trunk_rear: 'Portbagaj spate', trunk_front: 'Portbagaj față (frunk)',
@@ -175,7 +175,7 @@ function apiFetch(url, options) {
 }
 
 const TOGGLES = {
-  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'Climate', icon: '❄️' },
+  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'Climatizare', icon: '❄️' },
   seat: { btn: 'toggleSeat', onCmd: 'seat_heater_on', offCmd: 'seat_heater_off', label: 'Scaun', icon: '🔥' },
   steering: { btn: 'toggleSteering', onCmd: 'steering_heater_on', offCmd: 'steering_heater_off', label: 'Volan', icon: '🔥' },
   sentry: { btn: 'toggleSentry', onCmd: 'sentry_on', offCmd: 'sentry_off', label: 'Sentry', icon: '🛡️' },
@@ -294,7 +294,7 @@ async function refreshStatus() {
       const battery = d.charge_state ? d.charge_state.battery_level : '?';
       const locked = d.vehicle_state ? (d.vehicle_state.locked ? 'Da' : 'Nu') : '?';
       const climate = d.climate_state ? (d.climate_state.is_climate_on ? 'Pornit' : 'Oprit') : '?';
-      document.getElementById('status').innerHTML = `Baterie: <b>${battery}%</b> · Blocată: <b>${locked}</b> · Climate: <b>${climate}</b>`;
+      document.getElementById('status').innerHTML = `Baterie: <b>${battery}%</b> · Blocată: <b>${locked}</b> · Climatizare: <b>${climate}</b>`;
       document.getElementById('status').classList.remove('success', 'error');
       updateTempReadout(d.climate_state);
       updateExtraData(d);
