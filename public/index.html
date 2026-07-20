@@ -203,13 +203,13 @@ async function toggleFeature(key) {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      setStatus('❌ ' + t.label + ': ' + j.error, 'error');
+      showCommandError(t.label, j.error);
     } else if (j.response && j.response.result === true) {
       renderToggle(key, goingOn);
       if ((key === 'seat' || key === 'steering') && goingOn) renderToggle('climate', true);
       setStatus('✅ ' + t.label + ' — reușit', 'success');
     } else {
-      setStatus('❌ ' + t.label + ' a eșuat: ' + (j.response && j.response.reason || 'motiv necunoscut'), 'error');
+      showCommandError(t.label, j.response && j.response.reason || 'motiv necunoscut');
     }
   } catch (e) {
     setStatus('❌ Eroare de rețea: ' + e, 'error');
@@ -223,6 +223,22 @@ function setStatus(text, kind) {
   if (kind) statusEl.classList.add(kind);
 }
 
+const VIRTUAL_KEY_URL = 'https://tesla.com/_ak/testrace.netlify.app';
+
+function showCommandError(label, message) {
+  const statusEl = document.getElementById('status');
+  statusEl.classList.remove('success');
+  statusEl.classList.add('error');
+  if (typeof message === 'string' && /not been paired/i.test(message)) {
+    statusEl.innerHTML = '❌ ' + label + ': cheia virtuală nu e asociată cu mașina. ' +
+      'Pe telefon, cu aplicația Tesla deschisă și lângă mașină, accesează ' +
+      '<a href="' + VIRTUAL_KEY_URL + '" target="_blank" rel="noopener noreferrer">' + VIRTUAL_KEY_URL + '</a>' +
+      ' și apasă „Add Key”.';
+  } else {
+    statusEl.textContent = '❌ ' + label + ': ' + message;
+  }
+}
+
 async function send(cmd) {
   const label = LABELS[cmd] || cmd;
   setStatus('Trimit: ' + label + '...', null);
@@ -230,14 +246,14 @@ async function send(cmd) {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      setStatus('❌ ' + label + ': ' + j.error, 'error');
+      showCommandError(label, j.error);
     } else if (cmd === 'wake') {
       const state = j.response && j.response.state;
       setStatus('✅ Trezire trimisă' + (state ? ' (stare: ' + state + ')' : ''), 'success');
     } else if (j.response && j.response.result === true) {
       setStatus('✅ ' + label + ' — reușit', 'success');
     } else if (j.response && j.response.result === false) {
-      setStatus('❌ ' + label + ' a eșuat: ' + (j.response.reason || 'motiv necunoscut'), 'error');
+      showCommandError(label, j.response.reason || 'motiv necunoscut');
     } else {
       setStatus(label + ': ' + JSON.stringify(j), null);
     }
@@ -313,12 +329,12 @@ async function adjustTemp(direction) {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      setStatus('❌ Temperatură: ' + j.error, 'error');
+      showCommandError('Temperatură', j.error);
     } else if (j.response && j.response.result === true) {
       document.getElementById('tempTarget').textContent = j.newTemp.toFixed(1) + '°C';
       setStatus('✅ Setat la ' + j.newTemp.toFixed(1) + '°C', 'success');
     } else {
-      setStatus('❌ Temperatură: ' + (j.response && j.response.reason || JSON.stringify(j)), 'error');
+      showCommandError('Temperatură', j.response && j.response.reason || JSON.stringify(j));
     }
   } catch (e) {
     setStatus('❌ Eroare de rețea: ' + e, 'error');
@@ -332,12 +348,12 @@ async function adjustChargeLimit(direction) {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      setStatus('❌ Limită încărcare: ' + j.error, 'error');
+      showCommandError('Limită încărcare', j.error);
     } else if (j.response && j.response.result === true) {
       document.getElementById('chargeLimitTarget').textContent = j.newLimit + '%';
       setStatus('✅ Limită setată la ' + j.newLimit + '%', 'success');
     } else {
-      setStatus('❌ Limită încărcare: ' + (j.response && j.response.reason || JSON.stringify(j)), 'error');
+      showCommandError('Limită încărcare', j.response && j.response.reason || JSON.stringify(j));
     }
   } catch (e) {
     setStatus('❌ Eroare de rețea: ' + e, 'error');
