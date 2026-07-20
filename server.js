@@ -551,6 +551,66 @@ setTimeout(() => {
   });
 }, 1500);
 
+// ── Alert notifications: lightly polls recent_alerts while the app is
+// running and shows a native Windows notification for anything new (e.g.
+// the car's alarm/Sentry Mode firing). Local single-user install only -
+// remote sessions (grumpylabs.ro/teslaapp) don't get desktop notifications
+// since there's no local machine to show them on. ──
+const ALERT_STATE_FILE = path.join(DATA_DIR, '.last-alert-seen.json');
+const ALERT_POLL_INTERVAL_MS = 120000;
+
+function loadAlertState() {
+  try {
+    return JSON.parse(fs.readFileSync(ALERT_STATE_FILE, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+function saveAlertState(vin, time) {
+  fs.writeFileSync(ALERT_STATE_FILE, JSON.stringify({ vin, time: time.toISOString() }));
+}
+
+function notifyAlert(alert) {
+  console.log('[alerts]', alert.name, '-', alert.user_text || '');
+  try {
+    const { Notification } = require('electron');
+    if (Notification && Notification.isSupported()) {
+      new Notification({
+        title: 'RemTes — alertă mașină',
+        body: alert.user_text || alert.name,
+      }).show();
+    }
+  } catch {}
+}
+
+async function checkForNewAlerts() {
+  if (!hasValidTokens()) return;
+  const tokens = loadTokens();
+  if (!tokens.vin) return;
+  try {
+    const accessToken = await getAccessToken();
+    const r = await proxyRequest('GET', `/api/1/vehicles/${tokens.vin}/recent_alerts`, accessToken);
+    const json = JSON.parse(r.body);
+    const alerts = (json.response && json.response.recent_alerts) || [];
+    if (!alerts.length) return;
+
+    const state = loadAlertState();
+    const lastSeen = state && state.vin === tokens.vin ? new Date(state.time) : null;
+    // recent_alerts is newest-first.
+    const newAlerts = lastSeen ? alerts.filter((a) => new Date(a.time) > lastSeen) : [];
+    saveAlertState(tokens.vin, new Date(alerts[0].time));
+    // On the very first check (no baseline yet, or after switching cars),
+    // just record the baseline instead of notifying about the car's entire
+    // alert history at once.
+    if (lastSeen) newAlerts.reverse().forEach(notifyAlert);
+  } catch (err) {
+    console.error('[alerts] check failed:', err.message || err);
+  }
+}
+
+setInterval(checkForNewAlerts, ALERT_POLL_INTERVAL_MS);
+setTimeout(checkForNewAlerts, 5000);
+
 // ── Cloudflare quick tunnel: exposes this server publicly under a random
 // *.trycloudflare.com URL, then uploads that URL to grumpylabs.ro via FTP
 // so the PHP page there knows where to forward requests. Only runs on the
