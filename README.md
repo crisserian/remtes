@@ -1,0 +1,59 @@
+# RemTes
+
+Aplicație gratuită pentru Windows care îți permite să controlezi mașina Tesla direct de pe calculator, prin API-ul oficial Tesla Fleet.
+
+## De ce e sigur
+
+- **Te loghezi cu propriul cont Tesla** (OAuth oficial Tesla) — RemTes nu vede și nu stochează niciodată parola contului tău.
+- **Totul rulează local, pe calculatorul tău.** Nu există niciun server intermediar al RemTes care să vadă comenzile tale sau datele mașinii — cererile merg direct din aplicație către API-ul Tesla.
+- **Comenzile către mașină sunt semnate criptografic local**, folosind proxy-ul oficial Tesla (`tesla-http-proxy`, din [teslamotors/vehicle-command](https://github.com/teslamotors/vehicle-command)) — exact mecanismul recomandat de Tesla pentru integrări third-party.
+- Codul sursă e public tocmai ca oricine să poată verifica afirmațiile de mai sus.
+
+## Ce poate face
+
+- Blocare / deblocare
+- Climate control + scaune / volan încălzite
+- Sentry Mode
+- Pornit / oprit încărcare + limită procent baterie
+- Deschis / închis geamuri, portbagaj față/spate, capacul de încărcare
+- Baterie, autonomie, presiune anvelope
+- Flash faruri, claxon, trezire mașină
+
+## Cum funcționează
+
+1. La prima rulare, te loghezi cu contul tău Tesla (pagina oficială Tesla, nu una falsă).
+2. Aplicația primește de la Tesla un token de acces valabil doar pentru contul tău, stocat local pe calculatorul tău (`app.getPath('userData')`), nu într-o bază de date externă.
+3. Când apeși un buton, aplicația trimite comanda către mașină prin proxy-ul de semnare local (`127.0.0.1`), apoi către API-ul Tesla.
+
+## Instalare (pentru utilizatori)
+
+Descarcă installerul de pe [grumpylabs.ro/remtes](https://www.grumpylabs.ro/remtes/). Windows poate arăta un avertisment SmartScreen deoarece aplicația nu are un certificat de semnare plătit — apasă „More info" → „Run anyway".
+
+## Build din sursă
+
+Ai nevoie de propria aplicație Tesla Developer ([developer.tesla.com](https://developer.tesla.com)) cu:
+- un `client_id` și `client_secret` (OAuth)
+- un domeniu verificat (Partner Account) cu cheia publică găzduită la `/.well-known/appspecific/com.tesla.3p.public-key.pem`
+- o pereche de chei EC P-256 pentru virtual key signing
+
+Fișiere necesare, care NU sunt incluse în acest repo (vezi `.gitignore`) și trebuie create manual:
+
+| Fișier | Conținut |
+|---|---|
+| `client-secret.txt` | client secret-ul OAuth al aplicației tale Tesla, ca text simplu |
+| `tesla-private-key.pem` | cheia privată EC P-256 folosită pentru semnarea comenzilor (virtual key) |
+| `proxy-tls-cert.pem` / `proxy-tls-key.pem` | certificat TLS self-signed pentru proxy-ul local (`openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 ...`) |
+
+De asemenea trebuie descărcat/compilat `tesla-http-proxy.exe` din [teslamotors/vehicle-command](https://github.com/teslamotors/vehicle-command).
+
+În `server.js`, actualizează `CLIENT_ID` și `OAUTH_REDIRECT_URI` cu valorile aplicației tale.
+
+```
+npm install
+npm start          # rulează în Electron, pentru testare
+npm run dist       # generează installerul NSIS în dist-installer/
+```
+
+## Licență
+
+Fără licență explicită momentan — cod pus la dispoziție doar în scop de transparență și verificare de către utilizatori.

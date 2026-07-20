@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RemTes</title>
+<style>
+  :root {
+    --bg: #09090f; --surface: #12121e; --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.08);
+    --accent: #6c63ff; --accent2: #00d4aa; --danger: #ff6b6b; --gold: #f59e0b;
+    --text: #e8e8f0; --muted: #888899;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 1rem; overflow-y: auto; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; width: 100%; max-width: 900px; display: flex; flex-direction: column; margin: auto 0; }
+  h1 { font-size: 1.15rem; margin: 0 0 .15rem; }
+  .sub { color: var(--muted); font-size: .75rem; margin-bottom: .75rem; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; }
+  .logout-btn { color: var(--muted); font-size: .8rem; text-decoration: underline; }
+  .status { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .6rem .8rem; margin-bottom: .6rem; font-size: .8rem; color: #c5c5d2; min-height: 1.2rem; }
+  .status.success { border-color: rgba(0,212,170,.4); color: var(--accent2); }
+  .status.error { border-color: rgba(255,107,107,.4); color: var(--danger); }
+  .extra-data { display: flex; flex-wrap: wrap; gap: .3rem .8rem; font-size: .72rem; color: var(--muted); margin-bottom: .85rem; }
+  .extra-data b { color: var(--text); }
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+  .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: .85rem; }
+  .panel-title { font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-bottom: .6rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .65rem; font-size: .82rem; font-weight: 600; cursor: pointer; transition: opacity .15s, transform .1s; }
+  button:hover { opacity: .8; }
+  button:active { transform: scale(0.97); }
+  button.wide { grid-column: 1 / -1; }
+  button.lock { color: var(--accent2); }
+  button.unlock { color: var(--gold); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.toggle-btn.on { background: rgba(0,212,170,.15); border-color: rgba(0,212,170,.4); color: var(--accent2); }
+  .refresh-btn { margin-top: .85rem; width: 100%; background: var(--accent); color: white; border: none; padding: .7rem; border-radius: 10px; font-weight: 700; cursor: pointer; }
+  .donate-link { display: block; text-align: center; margin-top: .85rem; color: var(--gold); font-size: .8rem; text-decoration: none; font-weight: 600; }
+  .donate-link:hover { text-decoration: underline; }
+  .tpms-box { margin-bottom: .85rem; }
+  .tpms-title { font-size: .72rem; color: var(--muted); margin-bottom: .35rem; }
+  .tpms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; max-width: 260px; }
+  .tpms-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .4rem .55rem; font-size: .7rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+  .tpms-cell b { color: var(--text); font-size: .82rem; }
+  .auto-refresh-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .6rem; font-size: .75rem; color: var(--muted); }
+  .auto-refresh-row select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .35rem .5rem; font-size: .75rem; }
+  .temp-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .6rem; margin-bottom: .5rem; }
+  .temp-readout { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .3rem .8rem; font-size: .74rem; color: var(--muted); margin-bottom: .5rem; }
+  .temp-readout b { color: var(--text); font-size: .85rem; }
+  .temp-adjust { display: flex; align-items: center; justify-content: center; gap: .85rem; }
+  .temp-adjust button { width: 2.1rem; height: 2.1rem; border-radius: 50%; font-size: 1rem; padding: 0; }
+  .temp-target { font-size: 1.05rem; font-weight: 700; min-width: 3.6rem; text-align: center; }
+
+  @media (max-width: 700px) {
+    body { padding: .5rem; }
+    .card { padding: 1rem; border-radius: 16px; }
+    .panels { grid-template-columns: 1fr; }
+    h1 { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top-row">
+    <h1>🚗 RemTes</h1>
+    <a href="/logout" class="logout-btn">Ieșire</a>
+  </div>
+  <div class="status" id="status">Se încarcă...</div>
+  <div class="extra-data" id="extraData"></div>
+  <div class="tpms-box">
+    <div class="tpms-title">🛞 Presiune anvelope (Bar)</div>
+    <div class="tpms-grid">
+      <div class="tpms-cell"><span>Față stânga</span><b id="tpmsFL">–</b></div>
+      <div class="tpms-cell"><span>Față dreapta</span><b id="tpmsFR">–</b></div>
+      <div class="tpms-cell"><span>Spate stânga</span><b id="tpmsRL">–</b></div>
+      <div class="tpms-cell"><span>Spate dreapta</span><b id="tpmsRR">–</b></div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-title">🔒 Acces & siguranță</div>
+      <div class="grid">
+        <button onclick="send('wake')">⏰ Trezește mașina</button>
+        <button onclick="send('flash')">💡 Flash faruri</button>
+        <button onclick="send('honk')">📯 Claxon</button>
+        <button class="toggle-btn" id="toggleWindows" onclick="toggleFeature('windows')">🪟 Geamuri: –</button>
+        <button class="toggle-btn" id="toggleSentry" onclick="toggleFeature('sentry')">🛡️ Sentry: –</button>
+        <button class="toggle-btn" id="toggleLock" onclick="toggleFeature('lock')">🔒 Blocare: –</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">❄️ Climate</div>
+      <div class="temp-box">
+        <div class="temp-readout">
+          <span>🏠 In: <b id="tempInside">–</b></span>
+          <span>🌤️ Out: <b id="tempOutside">–</b></span>
+        </div>
+        <div class="temp-adjust">
+          <button onclick="adjustTemp(-1)">➖</button>
+          <span class="temp-target" id="tempTarget">–</span>
+          <button onclick="adjustTemp(1)">➕</button>
+        </div>
+      </div>
+      <div class="grid">
+        <button class="wide toggle-btn" id="toggleClimate" onclick="toggleFeature('climate')">❄️ Climate: –</button>
+        <button class="toggle-btn" id="toggleSeat" onclick="toggleFeature('seat')">🔥 Scaun: –</button>
+        <button class="toggle-btn" id="toggleSteering" onclick="toggleFeature('steering')">🔥 Volan: –</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🔋 Încărcare</div>
+      <div class="temp-box">
+        <div class="temp-readout">
+          <span>Limită</span>
+          <span>Stare: <b id="chargingState">–</b></span>
+        </div>
+        <div class="temp-adjust">
+          <button onclick="adjustChargeLimit(-1)">➖</button>
+          <span class="temp-target" id="chargeLimitTarget">–</span>
+          <button onclick="adjustChargeLimit(1)">➕</button>
+        </div>
+      </div>
+      <div class="grid">
+        <button onclick="send('charge_start')">▶️ Start încărcare</button>
+        <button onclick="send('charge_stop')">⏹️ Stop încărcare</button>
+        <button class="wide toggle-btn" id="toggleChargePort" onclick="toggleFeature('chargePort')">🔌 Capac priză: –</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🚗 Portbagaj</div>
+      <div class="grid">
+        <button class="wide" onclick="send('trunk_rear')">🚗 Portbagaj spate</button>
+        <button class="wide" onclick="send('trunk_front')">Portbagaj față (frunk)</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="refresh-btn" onclick="refreshStatus()">🔄 Actualizează status</button>
+  <div class="auto-refresh-row">
+    <label for="autoRefresh">Auto-actualizare:</label>
+    <select id="autoRefresh" onchange="setAutoRefresh(this.value)">
+      <option value="0">Oprit</option>
+      <option value="30">30 secunde</option>
+      <option value="60">1 minut</option>
+      <option value="180">3 minute</option>
+      <option value="300">5 minute</option>
+      <option value="600">10 minute</option>
+    </select>
+  </div>
+  <a class="donate-link" href="https://revolut.me/andreiedward" target="_blank" rel="noopener noreferrer">💛 Donează pentru a susține proiectul</a>
+</div>
+<script>
+const LABELS = {
+  lock: 'Blocare', unlock: 'Deblocare', climate_on: 'Climate ON', climate_off: 'Climate OFF',
+  flash: 'Flash faruri', honk: 'Claxon', wake: 'Trezire mașină', vent_windows: 'Deschidere geamuri', close_windows: 'Închidere geamuri',
+  charge_start: 'Start încărcare', charge_stop: 'Stop încărcare', charge_port_open: 'Deschidere capac priză', charge_port_close: 'Închidere capac priză',
+  trunk_rear: 'Portbagaj spate', trunk_front: 'Portbagaj față (frunk)',
+  sentry_on: 'Sentry Mode ON', sentry_off: 'Sentry Mode OFF',
+  seat_heater_on: 'Scaun încălzit ON', seat_heater_off: 'Scaun încălzit OFF',
+  steering_heater_on: 'Volan încălzit ON', steering_heater_off: 'Volan încălzit OFF',
+};
+
+// Custom header so any other webpage the user might have open can't
+// silently trigger commands against this local server (see server.js).
+function apiFetch(url, options) {
+  options = options || {};
+  options.headers = Object.assign({}, options.headers, { 'X-Requested-With': 'RemTes' });
+  return fetch(url, options);
+}
+
+const TOGGLES = {
+  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'Climate', icon: '❄️' },
+  seat: { btn: 'toggleSeat', onCmd: 'seat_heater_on', offCmd: 'seat_heater_off', label: 'Scaun', icon: '🔥' },
+  steering: { btn: 'toggleSteering', onCmd: 'steering_heater_on', offCmd: 'steering_heater_off', label: 'Volan', icon: '🔥' },
+  sentry: { btn: 'toggleSentry', onCmd: 'sentry_on', offCmd: 'sentry_off', label: 'Sentry', icon: '🛡️' },
+  lock: { btn: 'toggleLock', onCmd: 'lock', offCmd: 'unlock', label: 'Blocare', icon: '🔒', onLabel: 'Blocată', offLabel: 'Deblocată' },
+  windows: { btn: 'toggleWindows', onCmd: 'close_windows', offCmd: 'vent_windows', label: 'Geamuri', icon: '🪟', onLabel: 'Închise', offLabel: 'Deschise' },
+  chargePort: { btn: 'toggleChargePort', onCmd: 'charge_port_open', offCmd: 'charge_port_close', label: 'Capac priză', icon: '🔌', onLabel: 'Deschis', offLabel: 'Închis' },
+};
+const toggleState = {};
+
+function renderToggle(key, isOn) {
+  toggleState[key] = isOn;
+  const t = TOGGLES[key];
+  const btn = document.getElementById(t.btn);
+  const stateLabel = isOn ? (t.onLabel || 'Pornit') : (t.offLabel || 'Oprit');
+  btn.textContent = `${t.icon} ${t.label}: ${stateLabel}`;
+  btn.classList.toggle('on', isOn);
+}
+
+async function toggleFeature(key) {
+  const t = TOGGLES[key];
+  const goingOn = !toggleState[key];
+  const cmd = goingOn ? t.onCmd : t.offCmd;
+  setStatus('Trimit: ' + t.label + '...', null);
+  try {
+    const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
+    const j = await r.json();
+    if (j.error) {
+      setStatus('❌ ' + t.label + ': ' + j.error, 'error');
+    } else if (j.response && j.response.result === true) {
+      renderToggle(key, goingOn);
+      if ((key === 'seat' || key === 'steering') && goingOn) renderToggle('climate', true);
+      setStatus('✅ ' + t.label + ' — reușit', 'success');
+    } else {
+      setStatus('❌ ' + t.label + ' a eșuat: ' + (j.response && j.response.reason || 'motiv necunoscut'), 'error');
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
+}
+
+function setStatus(text, kind) {
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = text;
+  statusEl.classList.remove('success', 'error');
+  if (kind) statusEl.classList.add(kind);
+}
+
+async function send(cmd) {
+  const label = LABELS[cmd] || cmd;
+  setStatus('Trimit: ' + label + '...', null);
+  try {
+    const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
+    const j = await r.json();
+    if (j.error) {
+      setStatus('❌ ' + label + ': ' + j.error, 'error');
+    } else if (cmd === 'wake') {
+      const state = j.response && j.response.state;
+      setStatus('✅ Trezire trimisă' + (state ? ' (stare: ' + state + ')' : ''), 'success');
+    } else if (j.response && j.response.result === true) {
+      setStatus('✅ ' + label + ' — reușit', 'success');
+    } else if (j.response && j.response.result === false) {
+      setStatus('❌ ' + label + ' a eșuat: ' + (j.response.reason || 'motiv necunoscut'), 'error');
+    } else {
+      setStatus(label + ': ' + JSON.stringify(j), null);
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
+}
+
+function updateTempReadout(climate) {
+  if (!climate) return;
+  document.getElementById('tempInside').textContent = climate.inside_temp != null ? climate.inside_temp.toFixed(1) + '°C' : '–';
+  document.getElementById('tempOutside').textContent = climate.outside_temp != null ? climate.outside_temp.toFixed(1) + '°C' : '–';
+  document.getElementById('tempTarget').textContent = climate.driver_temp_setting != null ? climate.driver_temp_setting.toFixed(1) + '°C' : '–';
+}
+
+function updateExtraData(d) {
+  const cs = d.charge_state || {};
+  const vs = d.vehicle_state || {};
+  const rangeKm = cs.battery_range != null ? (cs.battery_range * 1.60934).toFixed(0) : '?';
+  document.getElementById('extraData').innerHTML = `
+    <span>🛣️ Autonomie: <b>${rangeKm} km</b></span>
+  `;
+  document.getElementById('tpmsFL').textContent = vs.tpms_pressure_fl != null ? vs.tpms_pressure_fl.toFixed(1) : '–';
+  document.getElementById('tpmsFR').textContent = vs.tpms_pressure_fr != null ? vs.tpms_pressure_fr.toFixed(1) : '–';
+  document.getElementById('tpmsRL').textContent = vs.tpms_pressure_rl != null ? vs.tpms_pressure_rl.toFixed(1) : '–';
+  document.getElementById('tpmsRR').textContent = vs.tpms_pressure_rr != null ? vs.tpms_pressure_rr.toFixed(1) : '–';
+  document.getElementById('chargingState').textContent = cs.charging_state || '–';
+  document.getElementById('chargeLimitTarget').textContent = cs.charge_limit_soc != null ? cs.charge_limit_soc + '%' : '–';
+}
+
+async function refreshStatus() {
+  setStatus('Se actualizează...', null);
+  try {
+    const r = await apiFetch('/api/status');
+    const j = await r.json();
+    if (j.response) {
+      const d = j.response;
+      const battery = d.charge_state ? d.charge_state.battery_level : '?';
+      const locked = d.vehicle_state ? (d.vehicle_state.locked ? 'Da' : 'Nu') : '?';
+      const climate = d.climate_state ? (d.climate_state.is_climate_on ? 'Pornit' : 'Oprit') : '?';
+      document.getElementById('status').innerHTML = `Baterie: <b>${battery}%</b> · Blocată: <b>${locked}</b> · Climate: <b>${climate}</b>`;
+      document.getElementById('status').classList.remove('success', 'error');
+      updateTempReadout(d.climate_state);
+      updateExtraData(d);
+      if (d.climate_state) {
+        renderToggle('climate', !!d.climate_state.is_climate_on);
+        renderToggle('seat', (d.climate_state.seat_heater_left || 0) > 0);
+        renderToggle('steering', !!d.climate_state.steering_wheel_heater);
+      }
+      if (d.vehicle_state) {
+        renderToggle('sentry', !!d.vehicle_state.sentry_mode);
+        renderToggle('lock', !!d.vehicle_state.locked);
+        const anyWindowOpen = [d.vehicle_state.fd_window, d.vehicle_state.fp_window, d.vehicle_state.rd_window, d.vehicle_state.rp_window].some((v) => v > 0);
+        renderToggle('windows', !anyWindowOpen);
+      }
+      if (d.charge_state) {
+        renderToggle('chargePort', !!d.charge_state.charge_port_door_open);
+      }
+    } else if (j.error) {
+      setStatus('❌ ' + j.error, 'error');
+    } else {
+      setStatus(JSON.stringify(j), null);
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
+}
+
+async function adjustTemp(direction) {
+  const cmd = direction > 0 ? 'temp_up' : 'temp_down';
+  setStatus('Reglez temperatura...', null);
+  try {
+    const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
+    const j = await r.json();
+    if (j.error) {
+      setStatus('❌ Temperatură: ' + j.error, 'error');
+    } else if (j.response && j.response.result === true) {
+      document.getElementById('tempTarget').textContent = j.newTemp.toFixed(1) + '°C';
+      setStatus('✅ Setat la ' + j.newTemp.toFixed(1) + '°C', 'success');
+    } else {
+      setStatus('❌ Temperatură: ' + (j.response && j.response.reason || JSON.stringify(j)), 'error');
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
+}
+
+async function adjustChargeLimit(direction) {
+  const cmd = direction > 0 ? 'charge_limit_up' : 'charge_limit_down';
+  setStatus('Reglez limita de încărcare...', null);
+  try {
+    const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
+    const j = await r.json();
+    if (j.error) {
+      setStatus('❌ Limită încărcare: ' + j.error, 'error');
+    } else if (j.response && j.response.result === true) {
+      document.getElementById('chargeLimitTarget').textContent = j.newLimit + '%';
+      setStatus('✅ Limită setată la ' + j.newLimit + '%', 'success');
+    } else {
+      setStatus('❌ Limită încărcare: ' + (j.response && j.response.reason || JSON.stringify(j)), 'error');
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
+}
+
+let autoRefreshTimer = null;
+function setAutoRefresh(seconds) {
+  localStorage.setItem('autoRefreshSeconds', seconds);
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  const s = parseInt(seconds, 10);
+  if (s > 0) autoRefreshTimer = setInterval(refreshStatus, s * 1000);
+}
+
+const savedAutoRefresh = localStorage.getItem('autoRefreshSeconds') || '0';
+document.getElementById('autoRefresh').value = savedAutoRefresh;
+setAutoRefresh(savedAutoRefresh);
+
+refreshStatus();
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Secrets - never commit these
+client-secret.txt
+tesla-private-key.pem
+proxy-tls-cert.pem
+proxy-tls-key.pem
+
+# Runtime data
+sessions/
+tokens.json
+*.log
+
+# Build artifacts
+node_modules/
+dist-installer/
+
+# Website/marketing files (grumpylabs.ro deployment, not part of the app)
+stats.php
+download.php
+remtes-htaccess
+remtes-index.php
+facebook-post-draft.md
