@@ -56,6 +56,14 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.0.6
+- Modificat: eliminată iconița mașinuță de lângă numele „RemTes" din antet.
+
+### 1.0.5
+- Modificat: interfața a fost redesenată — iconițe Tabler Icons (SVG, autogăzduite, fără nicio cerere către servicii externe) în loc de emoji, un rând de carduri sus cu baterie/autonomie/blocare/climatizare, panouri colorate pe categorie (siguranță/climatizare/încărcare/portbagaj).
+- Adăugat: urmărirea autonomiei la 100% încărcare, într-un grafic simplu — Tesla nu oferă un procent direct de „sănătate baterie" prin API, așa că aplicația reține automat autonomia raportată de fiecare dată când mașina ajunge la 100%, o dată pe zi, ca să arate trendul în timp.
+- Fix: la refresh-ul automat de token (o dată la ~8 ore), aplicația pierdea mașina selectată și toate comenzile începeau să eșueze cu „no vehicle selected", fără nicio cale de recuperare vizibilă în interfață.
+
 ### 1.0.3
 - Adăugat: notificare Windows nativă când apare o alertă nouă a mașinii (Sentry Mode/alarmă etc.), verificată din 2 în 2 minute cât timp aplicația rulează, prin endpoint-ul oficial `recent_alerts`.
 
