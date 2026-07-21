@@ -119,7 +119,7 @@ async function refreshToken(tokens) {
     client_id: CLIENT_ID,
     refresh_token: tokens.refresh_token,
   });
-  const newTokens = tokensFromJson(json, tokens.refresh_token);
+  const newTokens = Object.assign({}, tokens, tokensFromJson(json, tokens.refresh_token));
   saveTokens(newTokens);
   return newTokens;
 }

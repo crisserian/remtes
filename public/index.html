@@ -10,39 +10,53 @@
     --border: rgba(255,255,255,0.08);
     --accent: #6c63ff; --accent2: #00d4aa; --danger: #ff6b6b; --gold: #f59e0b;
     --text: #e8e8f0; --muted: #888899;
+    --c-safety: #85b7eb; --c-climate: #5dcaa5; --c-charging: #97c459; --c-trunk: #f0997b;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 1rem; overflow-y: auto; }
+  svg { display: block; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; width: 100%; max-width: 900px; display: flex; flex-direction: column; margin: auto 0; }
-  h1 { font-size: 1.15rem; margin: 0 0 .15rem; }
-  .sub { color: var(--muted); font-size: .75rem; margin-bottom: .75rem; }
-  .top-row { display: flex; justify-content: space-between; align-items: center; }
-  .logout-btn { color: var(--muted); font-size: .8rem; text-decoration: underline; }
+  .brand { display: flex; align-items: center; gap: .6rem; }
+  .brand-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); border: 1px solid rgba(124,116,255,.4); display: flex; align-items: center; justify-content: center; color: #9c96ff; flex-shrink: 0; }
+  h1 { font-size: 1.05rem; margin: 0; font-weight: 700; letter-spacing: .2px; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .85rem; }
+  .logout-btn { color: var(--muted); font-size: .78rem; text-decoration: none; display: flex; align-items: center; gap: .3rem; }
+  .logout-btn:hover { color: var(--text); }
   .status { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .6rem .8rem; margin-bottom: .6rem; font-size: .8rem; color: #c5c5d2; min-height: 1.2rem; }
   .status.success { border-color: rgba(0,212,170,.4); color: var(--accent2); }
   .status.error { border-color: rgba(255,107,107,.4); color: var(--danger); }
-  .extra-data { display: flex; flex-wrap: wrap; gap: .3rem .8rem; font-size: .72rem; color: var(--muted); margin-bottom: .85rem; }
-  .extra-data b { color: var(--text); }
+  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: .85rem; }
+  .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .55rem .3rem; text-align: center; }
+  .stat-icon { color: var(--accent2); margin: 0 auto .3rem; width: 16px; height: 16px; }
+  .stat-value { font-size: .92rem; font-weight: 700; }
+  .stat-label { font-size: .65rem; color: var(--muted); margin-top: .1rem; }
   .panels { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
   .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: .85rem; }
   .wide-panel { grid-column: 1 / -1; }
   .battery-chart-note { font-size: .7rem; color: var(--muted); margin-top: .4rem; }
-  .panel-title { font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-bottom: .6rem; }
+  .panel-title { display: flex; align-items: center; gap: .45rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-bottom: .6rem; }
+  .panel-safety { border-color: rgba(133,183,235,.25); }
+  .panel-safety .panel-title { color: var(--c-safety); }
+  .panel-climate { border-color: rgba(93,202,165,.25); }
+  .panel-climate .panel-title { color: var(--c-climate); }
+  .panel-charging { border-color: rgba(151,196,89,.25); }
+  .panel-charging .panel-title { color: var(--c-charging); }
+  .panel-trunk { border-color: rgba(240,153,123,.25); }
+  .panel-trunk .panel-title { color: var(--c-trunk); }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-  button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .65rem; font-size: .82rem; font-weight: 600; cursor: pointer; transition: opacity .15s, transform .1s; }
+  button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .65rem; font-size: .8rem; font-weight: 600; cursor: pointer; transition: opacity .15s, transform .1s; display: flex; align-items: center; justify-content: center; gap: .4rem; }
+  button svg { flex-shrink: 0; }
   button:hover { opacity: .8; }
   button:active { transform: scale(0.97); }
   button.wide { grid-column: 1 / -1; }
-  button.lock { color: var(--accent2); }
-  button.unlock { color: var(--gold); }
   button:disabled { opacity: .4; cursor: not-allowed; }
   button.toggle-btn.on { background: rgba(0,212,170,.15); border-color: rgba(0,212,170,.4); color: var(--accent2); }
   .refresh-btn { margin-top: .85rem; width: 100%; background: var(--accent); color: white; border: none; padding: .7rem; border-radius: 10px; font-weight: 700; cursor: pointer; }
-  .donate-link { display: block; text-align: center; margin-top: .85rem; color: var(--gold); font-size: .8rem; text-decoration: none; font-weight: 600; }
+  .donate-link { display: flex; align-items: center; justify-content: center; gap: .35rem; text-align: center; margin-top: .85rem; color: var(--gold); font-size: .8rem; text-decoration: none; font-weight: 600; }
   .donate-link:hover { text-decoration: underline; }
   .tpms-box { margin-bottom: .85rem; }
-  .tpms-title { font-size: .72rem; color: var(--muted); margin-bottom: .35rem; }
+  .tpms-title { display: flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--muted); margin-bottom: .35rem; }
   .tpms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; max-width: 260px; }
   .tpms-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .4rem .55rem; font-size: .7rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
   .tpms-cell b { color: var(--text); font-size: .82rem; }
@@ -52,27 +66,53 @@
   .temp-readout { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .3rem .8rem; font-size: .74rem; color: var(--muted); margin-bottom: .5rem; }
   .temp-readout b { color: var(--text); font-size: .85rem; }
   .temp-adjust { display: flex; align-items: center; justify-content: center; gap: .85rem; }
-  .temp-adjust button { width: 2.1rem; height: 2.1rem; border-radius: 50%; font-size: 1rem; padding: 0; }
+  .temp-adjust button { width: 2.1rem; height: 2.1rem; border-radius: 50%; padding: 0; }
   .temp-target { font-size: 1.05rem; font-weight: 700; min-width: 3.6rem; text-align: center; }
 
   @media (max-width: 700px) {
     body { padding: .5rem; }
     .card { padding: 1rem; border-radius: 16px; }
     .panels { grid-template-columns: 1fr; }
-    h1 { font-size: 1.05rem; }
+    .stat-cards { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="top-row">
-    <h1>🚗 RemTes</h1>
-    <a href="/logout" class="logout-btn">Ieșire</a>
+    <div class="brand">
+      <div class="brand-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" /></svg></div>
+      <h1>RemTes</h1>
+    </div>
+    <a href="/logout" class="logout-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /><path d="M15 12h-12l3 -3" /><path d="M6 15l-3 -3" /></svg>Ieșire</a>
   </div>
   <div class="status" id="status">Se încarcă...</div>
-  <div class="extra-data" id="extraData"></div>
+
+  <div class="stat-cards">
+    <div class="stat-card">
+      <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h11a2 2 0 0 1 2 2v.5a.5 .5 0 0 0 .5 .5a.5 .5 0 0 1 .5 .5v3a.5 .5 0 0 1 -.5 .5a.5 .5 0 0 0 -.5 .5v.5a2 2 0 0 1 -2 2h-11a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2" /><path d="M7 10l0 4" /><path d="M10 10l0 4" /></svg>
+      <div class="stat-value" id="statBattery">–</div>
+      <div class="stat-label">baterie</div>
+    </div>
+    <div class="stat-card">
+      <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4" /><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5" /></svg>
+      <div class="stat-value" id="statRange">–</div>
+      <div class="stat-label">autonomie</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon" id="statLockIcon" style="display:inline-flex"></span>
+      <div class="stat-value" id="statLock">–</div>
+      <div class="stat-label">acces</div>
+    </div>
+    <div class="stat-card">
+      <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" /></svg>
+      <div class="stat-value" id="statClimate">–</div>
+      <div class="stat-label">climatizare</div>
+    </div>
+  </div>
+
   <div class="tpms-box">
-    <div class="tpms-title">🛞 Presiune anvelope (Bar)</div>
+    <div class="tpms-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M13.41 10.59l2.59 -2.59" /><path d="M7 12a5 5 0 0 1 5 -5" /></svg>Presiune anvelope (Bar)</div>
     <div class="tpms-grid">
       <div class="tpms-cell"><span>Față stânga</span><b id="tpmsFL">–</b></div>
       <div class="tpms-cell"><span>Față dreapta</span><b id="tpmsFR">–</b></div>
@@ -82,73 +122,73 @@
   </div>
 
   <div class="panels">
-    <div class="panel">
-      <div class="panel-title">🔒 Acces & siguranță</div>
+    <div class="panel panel-safety">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" /></svg>Acces & siguranță</div>
       <div class="grid">
-        <button onclick="send('wake')">⏰ Trezește mașina</button>
-        <button onclick="send('flash')">💡 Flash faruri</button>
-        <button onclick="send('honk')">📯 Claxon</button>
-        <button class="toggle-btn" id="toggleWindows" onclick="toggleFeature('windows')">🪟 Geamuri: –</button>
-        <button class="toggle-btn" id="toggleSentry" onclick="toggleFeature('sentry')">🛡️ Sentry: –</button>
-        <button class="toggle-btn" id="toggleLock" onclick="toggleFeature('lock')">🔒 Blocare: –</button>
+        <button onclick="send('wake')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M12 10l0 3l2 0" /><path d="M7 4l-2.75 2" /><path d="M17 4l2.75 2" /></svg>Trezește mașina</button>
+        <button onclick="send('flash')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /><path d="M9.7 17l4.6 0" /></svg>Flash faruri</button>
+        <button onclick="send('honk')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a3 3 0 0 1 0 6" /><path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5" /><path d="M12 8l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8" /></svg>Claxon</button>
+        <button class="toggle-btn" id="toggleWindows" onclick="toggleFeature('windows')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3.866 0 -7 3.272 -7 7v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-10c0 -3.728 -3.134 -7 -7 -7" /><path d="M5 13l14 0" /><path d="M12 3l0 18" /></svg><span>Geamuri: –</span></button>
+        <button class="toggle-btn" id="toggleSentry" onclick="toggleFeature('sentry')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" /></svg><span>Sentry: –</span></button>
+        <button class="toggle-btn" id="toggleLock" onclick="toggleFeature('lock')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg><span>Blocare: –</span></button>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-title">❄️ Climatizare</div>
+    <div class="panel panel-climate">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" /></svg>Climatizare</div>
       <div class="temp-box">
         <div class="temp-readout">
-          <span>🏠 In: <b id="tempInside">–</b></span>
-          <span>🌤️ Out: <b id="tempOutside">–</b></span>
+          <span>In: <b id="tempInside">–</b></span>
+          <span>Out: <b id="tempOutside">–</b></span>
         </div>
         <div class="temp-adjust">
-          <button onclick="adjustTemp(-1)">➖</button>
+          <button onclick="adjustTemp(-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg></button>
           <span class="temp-target" id="tempTarget">–</span>
-          <button onclick="adjustTemp(1)">➕</button>
+          <button onclick="adjustTemp(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg></button>
         </div>
       </div>
       <div class="grid">
-        <button class="wide toggle-btn" id="toggleClimate" onclick="toggleFeature('climate')">❄️ Climatizare: –</button>
-        <button class="toggle-btn" id="toggleSeat" onclick="toggleFeature('seat')">🔥 Scaun: –</button>
-        <button class="toggle-btn" id="toggleSteering" onclick="toggleFeature('steering')">🔥 Volan: –</button>
+        <button class="wide toggle-btn" id="toggleClimate" onclick="toggleFeature('climate')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" /></svg><span>Climatizare: –</span></button>
+        <button class="toggle-btn" id="toggleSeat" onclick="toggleFeature('seat')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></svg><span>Scaun: –</span></button>
+        <button class="toggle-btn" id="toggleSteering" onclick="toggleFeature('steering')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg><span>Volan: –</span></button>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-title">🔋 Încărcare</div>
+    <div class="panel panel-charging">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg>Încărcare</div>
       <div class="temp-box">
         <div class="temp-readout">
           <span>Limită</span>
           <span>Stare: <b id="chargingState">–</b></span>
         </div>
         <div class="temp-adjust">
-          <button onclick="adjustChargeLimit(-1)">➖</button>
+          <button onclick="adjustChargeLimit(-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg></button>
           <span class="temp-target" id="chargeLimitTarget">–</span>
-          <button onclick="adjustChargeLimit(1)">➕</button>
+          <button onclick="adjustChargeLimit(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg></button>
         </div>
       </div>
       <div class="grid">
-        <button onclick="send('charge_start')">▶️ Start încărcare</button>
-        <button onclick="send('charge_stop')">⏹️ Stop încărcare</button>
-        <button class="wide toggle-btn" id="toggleChargePort" onclick="toggleFeature('chargePort')">🔌 Capac priză: –</button>
+        <button onclick="send('charge_start')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg>Start</button>
+        <button onclick="send('charge_stop')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg>Stop</button>
+        <button class="wide toggle-btn" id="toggleChargePort" onclick="toggleFeature('chargePort')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12l5 5l-1.5 1.5a3.536 3.536 0 1 1 -5 -5l1.5 -1.5" /><path d="M17 12l-5 -5l1.5 -1.5a3.536 3.536 0 1 1 5 5l-1.5 1.5" /><path d="M3 21l2.5 -2.5" /><path d="M18.5 5.5l2.5 -2.5" /><path d="M10 11l-2 2" /><path d="M13 14l-2 2" /></svg><span>Capac priză: –</span></button>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-title">🚗 Portbagaj</div>
+    <div class="panel panel-trunk">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>Portbagaj</div>
       <div class="grid">
-        <button class="wide" onclick="send('trunk_rear')">🚗 Portbagaj spate</button>
-        <button class="wide" onclick="send('trunk_front')">Portbagaj față (frunk)</button>
+        <button class="wide" onclick="send('trunk_rear')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>Portbagaj spate</button>
+        <button class="wide" onclick="send('trunk_front')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>Portbagaj față (frunk)</button>
       </div>
     </div>
 
     <div class="panel wide-panel" id="batteryHistoryPanel" style="display:none">
-      <div class="panel-title">📉 Autonomie la 100% (istoric)</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6l4 -4l8 8" /><path d="M21 10l0 7l-7 0" /></svg>Autonomie la 100% (istoric)</div>
       <div id="batteryHistoryChart"></div>
     </div>
   </div>
 
-  <button class="refresh-btn" onclick="refreshStatus()">🔄 Actualizează status</button>
+  <button class="refresh-btn" onclick="refreshStatus()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>Actualizează status</button>
   <div class="auto-refresh-row">
     <label for="autoRefresh">Auto-actualizare:</label>
     <select id="autoRefresh" onchange="setAutoRefresh(this.value)">
@@ -160,9 +200,24 @@
       <option value="600">10 minute</option>
     </select>
   </div>
-  <a class="donate-link" href="https://revolut.me/andreiedward" target="_blank" rel="noopener noreferrer">💛 Donează pentru a susține proiectul</a>
+  <a class="donate-link" href="https://revolut.me/andreiedward" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>Donează pentru a susține proiectul</a>
 </div>
 <script>
+const ICONS = {
+  lock: '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" />',
+  'lock-open': '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M8 11v-5a4 4 0 0 1 8 0" />',
+  snowflake: '<path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" />',
+  window: '<path d="M12 3c-3.866 0 -7 3.272 -7 7v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-10c0 -3.728 -3.134 -7 -7 -7" /><path d="M5 13l14 0" /><path d="M12 3l0 18" />',
+  'shield-lock': '<path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" />',
+  flame: '<path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" />',
+  'steering-wheel': '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" />',
+  'plug-connected': '<path d="M7 12l5 5l-1.5 1.5a3.536 3.536 0 1 1 -5 -5l1.5 -1.5" /><path d="M17 12l-5 -5l1.5 -1.5a3.536 3.536 0 1 1 5 5l-1.5 1.5" /><path d="M3 21l2.5 -2.5" /><path d="M18.5 5.5l2.5 -2.5" /><path d="M10 11l-2 2" /><path d="M13 14l-2 2" />',
+};
+function svgIcon(name, size) {
+  size = size || 15;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+}
+
 const LABELS = {
   lock: 'Blocare', unlock: 'Deblocare', climate_on: 'Climatizare ON', climate_off: 'Climatizare OFF',
   flash: 'Flash faruri', honk: 'Claxon', wake: 'Trezire mașină', vent_windows: 'Deschidere geamuri', close_windows: 'Închidere geamuri',
@@ -182,13 +237,13 @@ function apiFetch(url, options) {
 }
 
 const TOGGLES = {
-  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'Climatizare', icon: '❄️' },
-  seat: { btn: 'toggleSeat', onCmd: 'seat_heater_on', offCmd: 'seat_heater_off', label: 'Scaun', icon: '🔥' },
-  steering: { btn: 'toggleSteering', onCmd: 'steering_heater_on', offCmd: 'steering_heater_off', label: 'Volan', icon: '🔥' },
-  sentry: { btn: 'toggleSentry', onCmd: 'sentry_on', offCmd: 'sentry_off', label: 'Sentry', icon: '🛡️' },
-  lock: { btn: 'toggleLock', onCmd: 'lock', offCmd: 'unlock', label: 'Blocare', icon: '🔒', onLabel: 'Blocată', offLabel: 'Deblocată' },
-  windows: { btn: 'toggleWindows', onCmd: 'close_windows', offCmd: 'vent_windows', label: 'Geamuri', icon: '🪟', onLabel: 'Închise', offLabel: 'Deschise' },
-  chargePort: { btn: 'toggleChargePort', onCmd: 'charge_port_open', offCmd: 'charge_port_close', label: 'Capac priză', icon: '🔌', onLabel: 'Deschis', offLabel: 'Închis' },
+  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'Climatizare', icon: 'snowflake' },
+  seat: { btn: 'toggleSeat', onCmd: 'seat_heater_on', offCmd: 'seat_heater_off', label: 'Scaun', icon: 'flame' },
+  steering: { btn: 'toggleSteering', onCmd: 'steering_heater_on', offCmd: 'steering_heater_off', label: 'Volan', icon: 'steering-wheel' },
+  sentry: { btn: 'toggleSentry', onCmd: 'sentry_on', offCmd: 'sentry_off', label: 'Sentry', icon: 'shield-lock' },
+  lock: { btn: 'toggleLock', onCmd: 'lock', offCmd: 'unlock', label: 'Blocare', onIcon: 'lock', offIcon: 'lock-open', onLabel: 'Blocată', offLabel: 'Deblocată' },
+  windows: { btn: 'toggleWindows', onCmd: 'close_windows', offCmd: 'vent_windows', label: 'Geamuri', icon: 'window', onLabel: 'Închise', offLabel: 'Deschise' },
+  chargePort: { btn: 'toggleChargePort', onCmd: 'charge_port_open', offCmd: 'charge_port_close', label: 'Capac priză', icon: 'plug-connected', onLabel: 'Deschis', offLabel: 'Închis' },
 };
 const toggleState = {};
 
@@ -197,8 +252,10 @@ function renderToggle(key, isOn) {
   const t = TOGGLES[key];
   const btn = document.getElementById(t.btn);
   const stateLabel = isOn ? (t.onLabel || 'Pornit') : (t.offLabel || 'Oprit');
-  btn.textContent = `${t.icon} ${t.label}: ${stateLabel}`;
+  const iconName = isOn ? (t.onIcon || t.icon) : (t.offIcon || t.icon);
+  btn.innerHTML = svgIcon(iconName) + `<span>${t.label}: ${stateLabel}</span>`;
   btn.classList.toggle('on', isOn);
+  if (key === 'lock') document.getElementById('statLockIcon').innerHTML = svgIcon(iconName, 16);
 }
 
 async function toggleFeature(key) {
@@ -279,10 +336,6 @@ function updateTempReadout(climate) {
 function updateExtraData(d) {
   const cs = d.charge_state || {};
   const vs = d.vehicle_state || {};
-  const rangeKm = cs.battery_range != null ? (cs.battery_range * 1.60934).toFixed(0) : '?';
-  document.getElementById('extraData').innerHTML = `
-    <span>🛣️ Autonomie: <b>${rangeKm} km</b></span>
-  `;
   document.getElementById('tpmsFL').textContent = vs.tpms_pressure_fl != null ? vs.tpms_pressure_fl.toFixed(1) : '–';
   document.getElementById('tpmsFR').textContent = vs.tpms_pressure_fr != null ? vs.tpms_pressure_fr.toFixed(1) : '–';
   document.getElementById('tpmsRL').textContent = vs.tpms_pressure_rl != null ? vs.tpms_pressure_rl.toFixed(1) : '–';
@@ -298,11 +351,15 @@ async function refreshStatus() {
     const j = await r.json();
     if (j.response) {
       const d = j.response;
-      const battery = d.charge_state ? d.charge_state.battery_level : '?';
-      const locked = d.vehicle_state ? (d.vehicle_state.locked ? 'Da' : 'Nu') : '?';
-      const climate = d.climate_state ? (d.climate_state.is_climate_on ? 'Pornit' : 'Oprit') : '?';
-      document.getElementById('status').innerHTML = `Baterie: <b>${battery}%</b> · Blocată: <b>${locked}</b> · Climatizare: <b>${climate}</b>`;
-      document.getElementById('status').classList.remove('success', 'error');
+      const battery = d.charge_state ? d.charge_state.battery_level : null;
+      const rangeKm = d.charge_state && d.charge_state.battery_range != null ? (d.charge_state.battery_range * 1.60934).toFixed(0) : null;
+      const locked = d.vehicle_state ? !!d.vehicle_state.locked : null;
+      const climateOn = d.climate_state ? !!d.climate_state.is_climate_on : null;
+      document.getElementById('statBattery').textContent = battery != null ? battery + '%' : '–';
+      document.getElementById('statRange').textContent = rangeKm != null ? rangeKm + ' km' : '–';
+      document.getElementById('statLock').textContent = locked == null ? '–' : (locked ? 'Blocată' : 'Deblocată');
+      document.getElementById('statClimate').textContent = climateOn == null ? '–' : (climateOn ? 'Pornit' : 'Oprit');
+      setStatus('Actualizat.', 'success');
       updateTempReadout(d.climate_state);
       updateExtraData(d);
       if (d.climate_state) {
@@ -406,6 +463,8 @@ function setAutoRefresh(seconds) {
   const s = parseInt(seconds, 10);
   if (s > 0) autoRefreshTimer = setInterval(refreshStatus, s * 1000);
 }
+
+document.getElementById('statLockIcon').innerHTML = svgIcon('lock', 16);
 
 const savedAutoRefresh = localStorage.getItem('autoRefreshSeconds') || '0';
 document.getElementById('autoRefresh').value = savedAutoRefresh;
