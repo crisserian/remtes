@@ -8,6 +8,8 @@ proxy-tls-key.pem
 sessions/
 tokens.json
 .oauth-state.txt
+.last-alert-seen.json
+battery-history.json
 *.log
 
 # Build artifacts

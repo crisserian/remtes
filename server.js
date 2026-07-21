@@ -293,6 +293,34 @@ async function adjustChargeLimit(accessToken, vin, delta) {
   return { status: r.status, body: r.body, newLimit: next };
 }
 
+// ── Battery range history: Tesla doesn't expose a battery-health/degradation
+// percentage through the Fleet API, so this opportunistically logs the rated
+// range at 100% charge (the same number owners track manually over time to
+// estimate degradation) whenever a status refresh happens to catch the car
+// fully charged - no extra API calls beyond what the dashboard already makes.
+const BATTERY_HISTORY_FILE = path.join(DATA_DIR, 'battery-history.json');
+
+function loadBatteryHistory() {
+  try {
+    return JSON.parse(fs.readFileSync(BATTERY_HISTORY_FILE, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+
+function recordBatteryRangeIfFull(chargeState) {
+  if (!chargeState || chargeState.battery_level !== 100) return;
+  const history = loadBatteryHistory();
+  const today = new Date().toISOString().slice(0, 10);
+  if (history.length && history[history.length - 1].date === today) return;
+  history.push({
+    date: today,
+    battery_range: chargeState.battery_range,
+    ideal_battery_range: chargeState.ideal_battery_range,
+  });
+  fs.writeFileSync(BATTERY_HISTORY_FILE, JSON.stringify(history, null, 2));
+}
+
 // Resolves {accessToken, vin} for a request: the owner's own car when used
 // locally (the Electron desktop app, always trusted), or a per-user session
 // for anyone using the public grumpylabs.ro/teslaapp login-with-Tesla flow.
@@ -514,8 +542,18 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/status') {
       const { accessToken, vin } = await resolveContext(req);
       const r = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data`, accessToken);
+      try {
+        const json = JSON.parse(r.body);
+        if (json.response) recordBatteryRangeIfFull(json.response.charge_state);
+      } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
       res.end(r.body);
+      return;
+    }
+
+    if (req.method === 'GET' && req.url === '/api/battery-history') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(loadBatteryHistory()));
       return;
     }
 

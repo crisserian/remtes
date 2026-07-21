@@ -26,6 +26,8 @@
   .extra-data b { color: var(--text); }
   .panels { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
   .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: .85rem; }
+  .wide-panel { grid-column: 1 / -1; }
+  .battery-chart-note { font-size: .7rem; color: var(--muted); margin-top: .4rem; }
   .panel-title { font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-bottom: .6rem; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
   button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .65rem; font-size: .82rem; font-weight: 600; cursor: pointer; transition: opacity .15s, transform .1s; }
@@ -138,6 +140,11 @@
         <button class="wide" onclick="send('trunk_rear')">🚗 Portbagaj spate</button>
         <button class="wide" onclick="send('trunk_front')">Portbagaj față (frunk)</button>
       </div>
+    </div>
+
+    <div class="panel wide-panel" id="batteryHistoryPanel" style="display:none">
+      <div class="panel-title">📉 Autonomie la 100% (istoric)</div>
+      <div id="batteryHistoryChart"></div>
     </div>
   </div>
 
@@ -360,6 +367,38 @@ async function adjustChargeLimit(direction) {
   }
 }
 
+async function renderBatteryHistory() {
+  try {
+    const r = await apiFetch('/api/battery-history');
+    const history = await r.json();
+    const panel = document.getElementById('batteryHistoryPanel');
+    const chart = document.getElementById('batteryHistoryChart');
+    panel.style.display = 'block';
+    if (!Array.isArray(history) || history.length < 2) {
+      chart.innerHTML = '<div class="battery-chart-note">Se înregistrează automat data viitoare când mașina ajunge la 100% încărcare. Sunt necesare cel puțin 2 puncte pentru a arăta un trend.</div>';
+      return;
+    }
+    const toKm = (mi) => mi * 1.60934;
+    const w = 600, h = 140, pad = 24;
+    const values = history.map((p) => toKm(p.battery_range));
+    const min = Math.min(...values), max = Math.max(...values);
+    const span = max - min || 1;
+    const stepX = history.length > 1 ? (w - pad * 2) / (history.length - 1) : 0;
+    const points = values.map((v, i) => [pad + i * stepX, h - pad - ((v - min) / span) * (h - pad * 2)]);
+    const path = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const dots = points.map((p, i) =>
+      `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="#6c63ff"><title>${history[i].date}: ${values[i].toFixed(0)} km</title></circle>`
+    ).join('');
+    chart.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px">
+        <path d="${path}" fill="none" stroke="#6c63ff" stroke-width="2" />
+        ${dots}
+      </svg>
+      <div class="battery-chart-note">${history[0].date}: <b>${values[0].toFixed(0)} km</b> &nbsp;→&nbsp; ${history[history.length - 1].date}: <b>${values[values.length - 1].toFixed(0)} km</b></div>
+    `;
+  } catch (e) {}
+}
+
 let autoRefreshTimer = null;
 function setAutoRefresh(seconds) {
   localStorage.setItem('autoRefreshSeconds', seconds);
@@ -373,6 +412,7 @@ document.getElementById('autoRefresh').value = savedAutoRefresh;
 setAutoRefresh(savedAutoRefresh);
 
 refreshStatus();
+renderBatteryHistory();
 </script>
 </body>
 </html>
