@@ -54,6 +54,21 @@ npm start          # rulează în Electron, pentru testare
 npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
+## Istoric versiuni
+
+### 1.0.3
+- Adăugat: notificare Windows nativă când apare o alertă nouă a mașinii (Sentry Mode/alarmă etc.), verificată din 2 în 2 minute cât timp aplicația rulează, prin endpoint-ul oficial `recent_alerts`.
+
+### 1.0.2
+- Modificat: eticheta „Climate" a fost redenumită „Climatizare" în toată interfața (titlu panou, buton, status live).
+
+### 1.0.1
+- Adăugat: când o comandă eșuează cu eroarea „your public key has not been paired with the vehicle", aplicația arată acum un mesaj explicativ cu link direct către pagina de asociere a cheii virtuale, în loc de eroarea brută a API-ului.
+
+### 1.0.0
+- Prima versiune publică: login cu propriul cont Tesla, control complet al mașinii (blocare/deblocare, climate, scaune/volan încălzite, Sentry Mode, încărcare + limită procent, geamuri, capac priză, portbagaj față/spate, claxon, faruri, trezire), status live (baterie, autonomie, presiune anvelope), auto-actualizare configurabilă.
+- Securitate: protecție CSRF pe comenzile locale, escapare XSS pe datele venite din contul Tesla, protecție login-CSRF prin `state` OAuth aleator cu validare single-use.
+
 ## Licență
 
 Fără licență explicită momentan — cod pus la dispoziție doar în scop de transparență și verificare de către utilizatori.
