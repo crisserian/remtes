@@ -22,14 +22,6 @@ try {
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
 const TOKENS_FILE = path.join(DATA_DIR, 'tokens.json');
-// app-secret.txt / ftp-config.json are only present on the "relay" install
-// (the developer's own PC, feeding grumpylabs.ro/teslaapp for other users'
-// browsers). A standalone distributable install has neither: it runs fully
-// locally for one person, with no tunnel and nothing to authenticate remotely.
-let APP_SECRET = null;
-try {
-  APP_SECRET = fs.readFileSync(path.join(DIR, 'app-secret.txt'), 'utf8').trim();
-} catch {}
 const CLIENT_ID = '750c9467-3412-44de-8853-ff78025f0a2b';
 // Not committed to source control (see .gitignore) - required for the OAuth
 // authorization_code exchange. Create this file yourself with your own
@@ -38,23 +30,15 @@ const CLIENT_SECRET = fs.readFileSync(path.join(DIR, 'client-secret.txt'), 'utf8
 const OAUTH_REDIRECT_URI = 'https://testrace.netlify.app/callback';
 const PROXY_PORT = 4443;
 const APP_PORT = 5750;
-const SESSIONS_DIR = path.join(DATA_DIR, 'sessions');
-if (!fs.existsSync(SESSIONS_DIR)) fs.mkdirSync(SESSIONS_DIR);
 
-// cloudflared always forwards tunnel traffic to us over loopback, so the
-// socket address alone can't tell local browser requests apart from requests
-// that arrived over the internet through the tunnel. Cloudflare's edge stamps
-// every request that passes through it with a "cf-ray" header - a client
-// cannot remove or forge this from outside Cloudflare's network, and a
-// request that never went through Cloudflare will never have it. That's the
-// signal we trust instead of the (spoofable-by-forwarding) socket address.
+// RemTes is a single-user local app: the HTTP server only ever binds to
+// 127.0.0.1 (see server.listen below), so nothing outside this machine can
+// reach it regardless of this check. isLocal() exists for a narrower
+// purpose: telling apart the Electron window itself from some other local
+// process/webpage that happens to know the port - it's the signal
+// passesLocalCsrfCheck below is built on.
 function isLocal(req) {
   return !req.headers['cf-ray'] && !req.headers['cf-connecting-ip'];
-}
-
-function isAuthorized(req) {
-  if (isLocal(req)) return true;
-  return APP_SECRET !== null && req.headers['x-app-secret'] === APP_SECRET;
 }
 
 // Any webpage the user visits in their normal browser can silently POST to
@@ -63,8 +47,7 @@ function isAuthorized(req) {
 // the browser into a CORS preflight first; since we never answer preflights
 // with an Access-Control-Allow-* header, the browser blocks the real request
 // for any page that isn't served by this app itself. Combined with an Origin
-// check as defense in depth. Only applies to local requests - the remote
-// relay path (if ever used) is already gated by APP_SECRET.
+// check as defense in depth.
 function passesLocalCsrfCheck(req) {
   if (!isLocal(req)) return true;
   const origin = req.headers['origin'];
@@ -187,33 +170,6 @@ function vehiclePickerHtml(vehicles) {
   </body></html>`;
 }
 
-// ── Per-user sessions (public multi-user login via "Sign in with Tesla") ──
-function sessionFile(id) {
-  return path.join(SESSIONS_DIR, id + '.json');
-}
-function loadSession(id) {
-  if (!/^[a-f0-9]+$/.test(id)) return null;
-  const file = sessionFile(id);
-  if (!fs.existsSync(file)) return null;
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
-}
-function saveSession(id, data) {
-  fs.writeFileSync(sessionFile(id), JSON.stringify(data, null, 2));
-}
-
-async function getAccessTokenForSession(session, sessionId) {
-  if (Math.floor(Date.now() / 1000) >= session.expires_at) {
-    const json = await tokenRequest({
-      grant_type: 'refresh_token',
-      client_id: CLIENT_ID,
-      refresh_token: session.refresh_token,
-    });
-    Object.assign(session, tokensFromJson(json, session.refresh_token));
-    saveSession(sessionId, session);
-  }
-  return session.access_token;
-}
-
 async function exchangeCodeForTokens(code) {
   const json = await tokenRequest({
     grant_type: 'authorization_code',
@@ -232,6 +188,15 @@ async function fetchVehicleList(accessToken) {
   return json.response.map((v) => ({ vin: v.vin, display_name: v.display_name, access_type: v.access_type }));
 }
 
+// Pinned to the exact self-signed cert we generated for the local signing
+// proxy (see README) - not "any CA", not "no verification at all". Since
+// this connection never reaches Tesla directly (the proxy binary itself
+// makes that call, over its own normal-CA-validated HTTPS), this only
+// needs to authenticate that we're really talking to our own proxy
+// process on the loopback interface, not something else that grabbed the
+// port first.
+const PROXY_CA = fs.readFileSync(path.join(DIR, 'proxy-tls-cert.pem'));
+
 function proxyRequest(method, urlPath, accessToken, bodyObj) {
   return new Promise((resolve, reject) => {
     const req = https.request(
@@ -240,7 +205,7 @@ function proxyRequest(method, urlPath, accessToken, bodyObj) {
         port: PROXY_PORT,
         path: urlPath,
         method,
-        rejectUnauthorized: false,
+        ca: PROXY_CA,
         headers: {
           Authorization: 'Bearer ' + accessToken,
           'Content-Type': 'application/json',
@@ -322,23 +287,14 @@ function recordBatteryRangeIfFull(chargeState) {
   fs.writeFileSync(BATTERY_HISTORY_FILE, JSON.stringify(history, null, 2));
 }
 
-// Resolves {accessToken, vin} for a request: the owner's own car when used
-// locally (the Electron desktop app, always trusted), or a per-user session
-// for anyone using the public grumpylabs.ro/teslaapp login-with-Tesla flow.
+// Resolves {accessToken, vin} for a request - always the owner's own car,
+// since RemTes only ever serves the local Electron window.
 async function resolveContext(req) {
-  if (isLocal(req)) {
-    const accessToken = await getAccessToken();
-    const tokens = loadTokens();
-    if (!tokens.vin) throw Object.assign(new Error('no vehicle selected'), { statusCode: 400 });
-    return { accessToken, vin: tokens.vin };
-  }
-  const sessionId = req.headers['x-session-id'];
-  if (!sessionId) throw Object.assign(new Error('missing session'), { statusCode: 401 });
-  const session = loadSession(sessionId);
-  if (!session) throw Object.assign(new Error('invalid or expired session'), { statusCode: 401 });
-  if (!session.vin) throw Object.assign(new Error('no vehicle selected for this session'), { statusCode: 400 });
-  const accessToken = await getAccessTokenForSession(session, sessionId);
-  return { accessToken, vin: session.vin };
+  if (!isLocal(req)) throw Object.assign(new Error('forbidden'), { statusCode: 403 });
+  const accessToken = await getAccessToken();
+  const tokens = loadTokens();
+  if (!tokens.vin) throw Object.assign(new Error('no vehicle selected'), { statusCode: 400 });
+  return { accessToken, vin: tokens.vin };
 }
 
 const COMMANDS = {
@@ -436,64 +392,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (!isAuthorized(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'unauthorized' }));
-      return;
-    }
-
     if (!passesLocalCsrfCheck(req)) {
       res.writeHead(403, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'forbidden' }));
-      return;
-    }
-
-    // ── Public multi-user login: exchange an OAuth code for tokens, list
-    // that account's vehicles, and create a session. Only reachable with
-    // the shared APP_SECRET (i.e. relayed through grumpylabs.ro), same as
-    // every other remote route. ──
-    if (req.method === 'POST' && req.url === '/session/create') {
-      let body = '';
-      req.on('data', (c) => (body += c));
-      req.on('end', async () => {
-        try {
-          const { code } = JSON.parse(body || '{}');
-          const tokens = await exchangeCodeForTokens(code);
-          const vehicles = await fetchVehicleList(tokens.access_token);
-          const sessionId = require('crypto').randomBytes(16).toString('hex');
-          const session = { ...tokens, vehicles, vin: vehicles.length === 1 ? vehicles[0].vin : null };
-          saveSession(sessionId, session);
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ session_id: sessionId, vehicles, vin: session.vin }));
-        } catch (err) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: String(err.message || err) }));
-        }
-      });
-      return;
-    }
-
-    if (req.method === 'POST' && req.url === '/session/select-vehicle') {
-      let body = '';
-      req.on('data', (c) => (body += c));
-      req.on('end', () => {
-        const { session_id, vin } = JSON.parse(body || '{}');
-        const session = loadSession(session_id);
-        if (!session) {
-          res.writeHead(404, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'invalid session' }));
-          return;
-        }
-        if (!session.vehicles.some((v) => v.vin === vin)) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'vehicle not in this account' }));
-          return;
-        }
-        session.vin = vin;
-        saveSession(session_id, session);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true }));
-      });
       return;
     }
 
@@ -660,7 +561,10 @@ proxy.stderr.on('data', (d) => process.stderr.write('[proxy] ' + d));
 proxy.on('exit', (code) => console.log('[proxy] exited with code', code));
 
 process.on('exit', () => proxy.kill());
-process.on('SIGINT', () => { proxy.kill(); if (tunnel) tunnel.kill(); process.exit(); });
+process.on('SIGINT', () => { proxy.kill(); process.exit(); });
+// SIGHUP has no real meaning on Windows (the only platform this ships for
+// today) but costs nothing to handle the same way for portability.
+process.on('SIGHUP', () => { proxy.kill(); process.exit(); });
 
 setTimeout(() => {
   server.listen(APP_PORT, '127.0.0.1', () => {
@@ -727,57 +631,3 @@ async function checkForNewAlerts() {
 
 setInterval(checkForNewAlerts, ALERT_POLL_INTERVAL_MS);
 setTimeout(checkForNewAlerts, 5000);
-
-// ── Cloudflare quick tunnel: exposes this server publicly under a random
-// *.trycloudflare.com URL, then uploads that URL to grumpylabs.ro via FTP
-// so the PHP page there knows where to forward requests. Only runs on the
-// developer's own relay install - a standalone distributable has no
-// ftp-config.json and simply skips this (fully local, single-user use). ──
-const CLOUDFLARED = 'C:\\Program Files (x86)\\cloudflared\\cloudflared.exe';
-let ftpConfig = null;
-try {
-  ftpConfig = JSON.parse(fs.readFileSync(path.join(DIR, 'ftp-config.json'), 'utf8'));
-} catch {}
-let tunnel = null;
-let tunnelUrlUploaded = null;
-
-function uploadTunnelUrl(url) {
-  if (url === tunnelUrlUploaded) return;
-  const tmpFile = path.join(DATA_DIR, '.tunnel-url.tmp');
-  fs.writeFileSync(tmpFile, url);
-  const { execFile } = require('child_process');
-  const ftpUrl = `ftp://${ftpConfig.host}/${ftpConfig.remotePath}`;
-  execFile('curl.exe', [
-    '-T', tmpFile,
-    '--user', `${ftpConfig.user}:${ftpConfig.pass}`,
-    ftpUrl,
-    '--ftp-create-dirs', '-sS',
-  ], (err, stdout, stderr) => {
-    if (err) {
-      console.error('[tunnel] FTP upload failed:', stderr || err.message);
-    } else {
-      tunnelUrlUploaded = url;
-      console.log('[tunnel] Public URL uploaded to grumpylabs.ro:', url);
-    }
-  });
-}
-
-function startTunnel() {
-  tunnel = spawn(CLOUDFLARED, ['tunnel', '--url', `http://localhost:${APP_PORT}`, '--no-autoupdate'], { cwd: DIR });
-  const urlPattern = /https:\/\/[a-zA-Z0-9.-]+\.trycloudflare\.com/;
-  const onData = (d) => {
-    const text = d.toString();
-    process.stdout.write('[tunnel] ' + text);
-    const match = text.match(urlPattern);
-    if (match) uploadTunnelUrl(match[0]);
-  };
-  tunnel.stdout.on('data', onData);
-  tunnel.stderr.on('data', onData);
-  tunnel.on('exit', (code) => console.log('[tunnel] exited with code', code));
-}
-
-if (ftpConfig) {
-  setTimeout(startTunnel, 2000);
-} else {
-  console.log('[tunnel] ftp-config.json not found - running standalone, no tunnel.');
-}

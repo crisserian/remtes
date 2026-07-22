@@ -9,6 +9,8 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 - **Comenzile către mașină sunt semnate criptografic local**, folosind proxy-ul oficial Tesla (`tesla-http-proxy`, din [teslamotors/vehicle-command](https://github.com/teslamotors/vehicle-command)) — exact mecanismul recomandat de Tesla pentru integrări third-party.
 - Codul sursă e public tocmai ca oricine să poată verifica afirmațiile de mai sus.
 - **Singura excepție**: la pornire, aplicația face un apel către `grumpylabs.ro/remtes/version.txt` doar ca să verifice dacă a apărut o versiune mai nouă — nu trimite niciun fel de date despre tine sau despre mașină, doar citește un fișier text cu numărul versiunii curente.
+- **`tesla-http-proxy.exe` se poate reconstrui local**, din sursa oficială Tesla, nu doar "ai încredere" într-un binar precompilat — vezi [Build din sursă](#build-din-sursă).
+- **Domeniul `testrace.netlify.app`** din fluxul OAuth e explicat și documentat integral, cu sursa exactă a paginii — vezi [De ce testrace.netlify.app?](#de-ce-testracenetlifyapp).
 
 ## Ce poate face
 
@@ -30,6 +32,32 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 2. Aplicația primește de la Tesla un token de acces valabil doar pentru contul tău, stocat local pe calculatorul tău (`app.getPath('userData')`), nu într-o bază de date externă.
 3. Când apeși un buton, aplicația trimite comanda către mașină prin proxy-ul de semnare local (`127.0.0.1`), apoi către API-ul Tesla.
 
+## De ce `testrace.netlify.app`?
+
+Tesla cere ca `redirect_uri`-ul din fluxul OAuth să fie un domeniu HTTPS verificat - nu acceptă `localhost` direct. `testrace.netlify.app` e un site static găzduit de mine (dezvoltatorul RemTes) pe Netlify, folosit **exclusiv** ca releu de redirect: primește codul de autorizare de la Tesla și îl retrimite imediat, în browser-ul tău, către `http://localhost:5750`, fără niciun apel de rețea suplimentar. Codul nu ajunge niciodată pe vreun server - pagina doar rescrie URL-ul din propriul tău browser.
+
+Nu trebuie să mă crezi pe cuvânt - asta e întregul conținut al paginii (verificabil oricând cu `curl https://testrace.netlify.app/callback` sau `view-source:`):
+
+```html
+<!DOCTYPE html>
+<html>
+<head><title>Tesla Control - redirecting...</title></head>
+<body>
+<p>Redirecting...</p>
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var state = params.get('state') || '';
+  var target = state.indexOf('local') === 0
+    ? 'http://localhost:5750/oauth-callback'
+    : 'https://www.grumpylabs.ro/teslaapp/oauth-callback.php';
+  window.location.replace(target + window.location.search);
+</script>
+</body>
+</html>
+```
+
+(Ramura `else` se referă la un relay personal, mai vechi, care nu mai există - RemTes generează întotdeauna un `state` care începe cu `local`, deci ia mereu prima ramură.)
+
 ## Instalare (pentru utilizatori)
 
 Descarcă installerul de pe [grumpylabs.ro/remtes](https://www.grumpylabs.ro/remtes/). Windows poate arăta un avertisment SmartScreen deoarece aplicația nu are un certificat de semnare plătit — apasă „More info" → „Run anyway".
@@ -47,9 +75,27 @@ Fișiere necesare, care NU sunt incluse în acest repo (vezi `.gitignore`) și t
 |---|---|
 | `client-secret.txt` | client secret-ul OAuth al aplicației tale Tesla, ca text simplu |
 | `tesla-private-key.pem` | cheia privată EC P-256 folosită pentru semnarea comenzilor (virtual key) |
-| `proxy-tls-cert.pem` / `proxy-tls-key.pem` | certificat TLS self-signed pentru proxy-ul local (`openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 ...`) |
+| `proxy-tls-cert.pem` / `proxy-tls-key.pem` | certificat TLS self-signed pentru proxy-ul local: `openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -keyout proxy-tls-key.pem -out proxy-tls-cert.pem -days 365 -nodes -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"` (SAN-ul e necesar - fără el, Node respinge certificatul la verificarea hostname-ului) |
 
-De asemenea trebuie descărcat/compilat `tesla-http-proxy.exe` din [teslamotors/vehicle-command](https://github.com/teslamotors/vehicle-command).
+### `tesla-http-proxy.exe`
+
+Nu trebuie doar "să ai încredere" că binarul inclus vine chiar din [teslamotors/vehicle-command](https://github.com/teslamotors/vehicle-command) - rulează `build-proxy.ps1` din acest repo, care:
+
+1. Clonează `teslamotors/vehicle-command` exact la tag-ul `v0.4.1` (commit `49977a18fd68567501d59e16a6c9e4a8b9348544`) - respinge orice altă rezoluție a tag-ului, în caz că a fost mutat.
+2. Compilează `cmd/tesla-http-proxy` local, cu Go-ul instalat pe calculatorul tău.
+3. Afișează hash-ul SHA256 al binarului rezultat.
+
+```
+powershell -ExecutionPolicy Bypass -File build-proxy.ps1
+```
+
+Hash-ul SHA256 al binarului inclus în ultima versiune publicată (1.0.13):
+
+```
+5856710984C76289C3CF9AEC2D0E7961F1F18A7FCD7AF0AEFD2A29ADCE2D4F89
+```
+
+Dacă rulezi scriptul și obții alt hash pentru același tag, ceva nu e în regulă - spune-mi.
 
 În `server.js`, actualizează `CLIENT_ID` și `OAUTH_REDIRECT_URI` cu valorile aplicației tale.
 
@@ -60,6 +106,14 @@ npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
 ## Istoric versiuni
+
+### 1.0.13
+Remediere a 4 din 6 puncte dintr-un code review primit pe GitHub (vezi și secțiunile noi din acest README):
+- Fix: `tesla-http-proxy.exe` se poate acum reconstrui local din sursa oficială Tesla (`build-proxy.ps1`), în loc să fie doar un binar precompilat fără nicio dovadă de proveniență.
+- Fix: conexiunea către proxy-ul local de semnare folosea `rejectUnauthorized: false` (accepta orice certificat); acum e pinned pe certificatul propriu, regenerat cu SAN corect (`subjectAltName`).
+- Adăugat: handler pentru `SIGHUP` alături de `SIGINT`, pentru curățare consistentă a proceselor.
+- Eliminat: mecanismul de sesiuni multi-user (`SESSIONS_DIR`) și tunelul Cloudflare — cod complet neutilizat după ștergerea relay-ului personal `grumpylabs.ro/teslaapp`, care ar fi crescut nelimitat pe disc dacă ar fi fost vreodată activ.
+- Documentat: rolul exact al `testrace.netlify.app` în fluxul OAuth, cu sursa completă a paginii inclusă în README.
 
 ### 1.0.12
 - Fix: linkurile externe (banner-ul de versiune nouă, link-ul de donații) deschideau o fereastră Electron goală, nestilizată, cu meniu implicit, în loc să deschidă browser-ul de sistem. Acum sunt trimise corect către browser-ul implicit.
