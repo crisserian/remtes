@@ -61,6 +61,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.0.12
+- Fix: linkurile externe (banner-ul de versiune nouă, link-ul de donații) deschideau o fereastră Electron goală, nestilizată, cu meniu implicit, în loc să deschidă browser-ul de sistem. Acum sunt trimise corect către browser-ul implicit.
+
 ### 1.0.11
 - Modificat: fereastra pornește maximizată, ca să încapă tot conținutul fără bară de scroll pe majoritatea ecranelor.
 

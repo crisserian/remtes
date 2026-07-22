@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, shell } = require('electron');
 
 // Starts the same signing proxy + local HTTP server + Cloudflare tunnel
 // used by the browser-based version (server.js), in-process.
@@ -44,6 +44,14 @@ function createWindow() {
   }
   tryLoad();
   mainWindow.maximize();
+
+  // Links with target="_blank" (e.g. the update banner's download link)
+  // would otherwise open in a bare, unstyled Electron window with the
+  // default menu bar - send them to the user's real browser instead.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   // Closing the window just hides it - the app keeps running in the tray so
   // background polling (alert notifications, battery-history tracking) still
