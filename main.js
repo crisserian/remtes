@@ -26,10 +26,10 @@ function createTrayIcon() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 980,
-    height: 1060,
+    width: 1400,
+    height: 900,
     minWidth: 960,
-    minHeight: 1060,
+    minHeight: 700,
     resizable: true,
     autoHideMenuBar: true,
     webPreferences: {
