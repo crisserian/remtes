@@ -43,6 +43,7 @@ function createWindow() {
     });
   }
   tryLoad();
+  mainWindow.maximize();
 
   // Closing the window just hides it - the app keeps running in the tray so
   // background polling (alert notifications, battery-history tracking) still

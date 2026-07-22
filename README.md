@@ -61,6 +61,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.0.11
+- Modificat: fereastra pornește maximizată, ca să încapă tot conținutul fără bară de scroll pe majoritatea ecranelor.
+
 ### 1.0.10
 - Fix: titlul ferestrei de confirmare (și al altor dialoguri native) arăta „remtes" cu literă mică — Electron citește câmpul `productName` de la rădăcina `package.json`, nu cel din secțiunea `build`, care era singurul setat până acum.
 - Modificat: fereastra e mai lată implicit (1400×900) și panourile se așază pe 3 coloane în loc de 2, ca să folosească spațiul orizontal disponibil în loc să oblige la scroll vertical.
