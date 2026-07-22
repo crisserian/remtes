@@ -17,8 +17,12 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 - Sentry Mode
 - Pornit / oprit încărcare + limită procent baterie
 - Deschis / închis geamuri, portbagaj față/spate, capacul de încărcare
-- Baterie, autonomie, presiune anvelope
+- Baterie, autonomie, presiune anvelope (cu avertizare la presiune scăzută)
 - Flash faruri, claxon, trezire mașină
+- Valet Mode și limitare de viteză cu PIN
+- Plecare programată (preîncălzire + încărcare cu tarif redus)
+- Stații de încărcare din apropiere
+- Notificare la alerte noi ale mașinii, urmărirea degradării bateriei în timp, verificare automată de versiune noi
 
 ## Cum funcționează
 
@@ -56,6 +60,15 @@ npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
 ## Istoric versiuni
+
+### 1.0.8
+- Fix: butoanele de sus (baterie/autonomie/blocare/climatizare) nu se actualizau imediat după o comandă reușită de blocare/climatizare — rămâneau cu valoarea veche până la următorul refresh manual.
+- Adăugat: rulare în fundal cu iconiță în system tray — închiderea ferestrei nu mai oprește aplicația, ca notificările de alertă și urmărirea degradării bateriei să funcționeze continuu.
+- Adăugat: prag de avertizare pentru presiunea anvelopelor (evidențiere roșie sub 2.2 Bar).
+- Adăugat: comutare rapidă între mașini din antet, pentru conturile cu mai multe vehicule Tesla.
+- Adăugat: Valet Mode și limitare de viteză cu PIN (activare/dezactivare + setare limită în km/h).
+- Adăugat: plecare programată — preîncălzire cabină și încărcare cu tarif redus la o oră stabilită.
+- Adăugat: căutare stații de încărcare din apropiere (Supercharger + destinație), cu distanță și locuri libere.
 
 ### 1.0.7
 - Adăugat: la pornire, aplicația verifică `grumpylabs.ro/remtes/version.txt` și arată un banner discret dacă a apărut o versiune mai nouă, cu link direct de descărcare. Nu e o notificare "push" reală (nu există server care să inițieze conexiunea) — este o verificare locală, la fiecare pornire a aplicației.

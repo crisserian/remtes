@@ -11,6 +11,7 @@
     --accent: #6c63ff; --accent2: #00d4aa; --danger: #ff6b6b; --gold: #f59e0b;
     --text: #e8e8f0; --muted: #888899;
     --c-safety: #85b7eb; --c-climate: #5dcaa5; --c-charging: #97c459; --c-trunk: #f0997b;
+    --c-valet: #e08fb0; --c-schedule: #b8a9f5; --c-nearby: #7fd4e0;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
@@ -45,6 +46,20 @@
   .panel-charging .panel-title { color: var(--c-charging); }
   .panel-trunk { border-color: rgba(240,153,123,.25); }
   .panel-trunk .panel-title { color: var(--c-trunk); }
+  .panel-valet { border-color: rgba(224,143,176,.25); }
+  .panel-valet .panel-title { color: var(--c-valet); }
+  .panel-schedule { border-color: rgba(184,169,245,.25); }
+  .panel-schedule .panel-title { color: var(--c-schedule); }
+  .panel-nearby { border-color: rgba(127,212,224,.25); }
+  .panel-nearby .panel-title { color: var(--c-nearby); }
+  .pin-input, .time-input, .num-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .5rem; font-size: .8rem; width: 100%; margin-bottom: .5rem; }
+  .field-row { display: flex; align-items: center; gap: .5rem; font-size: .75rem; color: var(--muted); margin-bottom: .5rem; }
+  .field-row label { flex: 1; }
+  .charging-site { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .5rem .6rem; margin-bottom: .4rem; font-size: .75rem; display: flex; justify-content: space-between; gap: .5rem; }
+  .charging-site b { color: var(--text); }
+  .charging-site span { color: var(--muted); }
+  .vehicle-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .3rem .5rem; font-size: .75rem; margin-right: .6rem; }
+  .tpms-cell b.low { color: var(--danger); }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
   button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .65rem; font-size: .8rem; font-weight: 600; cursor: pointer; transition: opacity .15s, transform .1s; display: flex; align-items: center; justify-content: center; gap: .4rem; }
   button svg { flex-shrink: 0; }
@@ -84,7 +99,10 @@
     <div class="brand">
       <h1>RemTes</h1>
     </div>
-    <a href="/logout" class="logout-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /><path d="M15 12h-12l3 -3" /><path d="M6 15l-3 -3" /></svg>Ieșire</a>
+    <div style="display:flex;align-items:center">
+      <select class="vehicle-select" id="vehicleSelect" style="display:none" onchange="switchVehicle(this.value)"></select>
+      <a href="/logout" class="logout-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /><path d="M15 12h-12l3 -3" /><path d="M6 15l-3 -3" /></svg>Ieșire</a>
+    </div>
   </div>
   <div class="update-banner" id="updateBanner" style="display:none"></div>
   <div class="status" id="status">Se încarcă...</div>
@@ -183,6 +201,39 @@
       </div>
     </div>
 
+    <div class="panel panel-valet">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /><path d="M15 9h.01" /></svg>Valet & limitare viteză</div>
+      <input type="password" inputmode="numeric" maxlength="4" class="pin-input" id="pinInput" placeholder="PIN (4 cifre)" />
+      <div class="grid">
+        <button onclick="valetToggle(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /><path d="M15 9h.01" /></svg>Activează Valet</button>
+        <button onclick="valetToggle(false)">Dezactivează Valet</button>
+      </div>
+      <input type="number" class="num-input" id="speedLimitInput" placeholder="Limită viteză (km/h)" style="margin-top:.5rem" />
+      <div class="grid">
+        <button onclick="speedLimitToggle(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.446 2.6l7.955 7.954a2.045 2.045 0 0 1 0 2.892l-7.955 7.955a2.045 2.045 0 0 1 -2.892 0l-7.955 -7.955a2.045 2.045 0 0 1 0 -2.892l7.955 -7.955a2.045 2.045 0 0 1 2.892 0" /><path d="M9 14v-2c0 -.59 .414 -1 1 -1h5" /><path d="M13 9l2 2l-2 2" /></svg>Activează limită</button>
+        <button onclick="speedLimitToggle(false)">Dezactivează limită</button>
+        <button class="wide" onclick="speedLimitSet()">Setează limita</button>
+      </div>
+    </div>
+
+    <div class="panel panel-schedule">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>Plecare programată</div>
+      <input type="time" class="time-input" id="departureTime" />
+      <div class="field-row"><label for="preconditionToggle">Preîncălzire cabină la plecare</label><input type="checkbox" id="preconditionToggle" /></div>
+      <div class="field-row"><label for="offPeakToggle">Încărcare cu tarif redus (off-peak)</label><input type="checkbox" id="offPeakToggle" /></div>
+      <input type="time" class="time-input" id="offPeakEndTime" title="Ora la care se termină tariful redus" />
+      <div class="grid">
+        <button class="wide" onclick="saveScheduleDeparture()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>Salvează programarea</button>
+        <button class="wide" onclick="cancelScheduleDeparture()">Anulează programarea</button>
+      </div>
+    </div>
+
+    <div class="panel wide-panel panel-nearby">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Stații de încărcare din apropiere</div>
+      <button class="wide" onclick="loadNearbyCharging()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Caută stații</button>
+      <div id="nearbyChargingList" style="margin-top:.5rem"></div>
+    </div>
+
     <div class="panel wide-panel" id="batteryHistoryPanel" style="display:none">
       <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6l4 -4l8 8" /><path d="M21 10l0 7l-7 0" /></svg>Autonomie la 100% (istoric)</div>
       <div id="batteryHistoryChart"></div>
@@ -227,7 +278,11 @@ const LABELS = {
   sentry_on: 'Sentry Mode ON', sentry_off: 'Sentry Mode OFF',
   seat_heater_on: 'Scaun încălzit ON', seat_heater_off: 'Scaun încălzit OFF',
   steering_heater_on: 'Volan încălzit ON', steering_heater_off: 'Volan încălzit OFF',
+  valet_on: 'Valet Mode ON', valet_off: 'Valet Mode OFF',
+  speed_limit_on: 'Limită viteză ON', speed_limit_off: 'Limită viteză OFF', speed_limit_set: 'Setare limită viteză',
+  schedule_departure: 'Plecare programată',
 };
+const TPMS_LOW_BAR = 2.2;
 
 // Custom header so any other webpage the user might have open can't
 // silently trigger commands against this local server (see server.js).
@@ -256,7 +311,13 @@ function renderToggle(key, isOn) {
   const iconName = isOn ? (t.onIcon || t.icon) : (t.offIcon || t.icon);
   btn.innerHTML = svgIcon(iconName) + `<span>${t.label}: ${stateLabel}</span>`;
   btn.classList.toggle('on', isOn);
-  if (key === 'lock') document.getElementById('statLockIcon').innerHTML = svgIcon(iconName, 16);
+  if (key === 'lock') {
+    document.getElementById('statLockIcon').innerHTML = svgIcon(iconName, 16);
+    document.getElementById('statLock').textContent = stateLabel;
+  }
+  if (key === 'climate') {
+    document.getElementById('statClimate').textContent = stateLabel;
+  }
 }
 
 async function toggleFeature(key) {
@@ -304,11 +365,16 @@ function showCommandError(label, message) {
   }
 }
 
-async function send(cmd) {
+async function send(cmd, bodyObj) {
   const label = LABELS[cmd] || cmd;
   setStatus('Trimit: ' + label + '...', null);
   try {
-    const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
+    const options = { method: 'POST' };
+    if (bodyObj) {
+      options.headers = { 'Content-Type': 'application/json' };
+      options.body = JSON.stringify(bodyObj);
+    }
+    const r = await apiFetch('/api/command/' + cmd, options);
     const j = await r.json();
     if (j.error) {
       showCommandError(label, j.error);
@@ -334,13 +400,19 @@ function updateTempReadout(climate) {
   document.getElementById('tempTarget').textContent = climate.driver_temp_setting != null ? climate.driver_temp_setting.toFixed(1) + '°C' : '–';
 }
 
+function setTpms(id, value) {
+  const el = document.getElementById(id);
+  el.textContent = value != null ? value.toFixed(1) : '–';
+  el.classList.toggle('low', value != null && value < TPMS_LOW_BAR);
+}
+
 function updateExtraData(d) {
   const cs = d.charge_state || {};
   const vs = d.vehicle_state || {};
-  document.getElementById('tpmsFL').textContent = vs.tpms_pressure_fl != null ? vs.tpms_pressure_fl.toFixed(1) : '–';
-  document.getElementById('tpmsFR').textContent = vs.tpms_pressure_fr != null ? vs.tpms_pressure_fr.toFixed(1) : '–';
-  document.getElementById('tpmsRL').textContent = vs.tpms_pressure_rl != null ? vs.tpms_pressure_rl.toFixed(1) : '–';
-  document.getElementById('tpmsRR').textContent = vs.tpms_pressure_rr != null ? vs.tpms_pressure_rr.toFixed(1) : '–';
+  setTpms('tpmsFL', vs.tpms_pressure_fl);
+  setTpms('tpmsFR', vs.tpms_pressure_fr);
+  setTpms('tpmsRL', vs.tpms_pressure_rl);
+  setTpms('tpmsRR', vs.tpms_pressure_rr);
   document.getElementById('chargingState').textContent = cs.charging_state || '–';
   document.getElementById('chargeLimitTarget').textContent = cs.charge_limit_soc != null ? cs.charge_limit_soc + '%' : '–';
 }
@@ -485,6 +557,112 @@ async function renderBatteryHistory() {
   } catch (e) {}
 }
 
+function readPin() {
+  const pin = document.getElementById('pinInput').value.trim();
+  if (!/^\d{4}$/.test(pin)) {
+    setStatus('❌ Introdu un PIN de 4 cifre.', 'error');
+    return null;
+  }
+  return pin;
+}
+
+async function valetToggle(on) {
+  const pin = readPin();
+  if (pin === null) return;
+  await send(on ? 'valet_on' : 'valet_off', { pin });
+}
+
+async function speedLimitToggle(on) {
+  const pin = readPin();
+  if (pin === null) return;
+  await send(on ? 'speed_limit_on' : 'speed_limit_off', { pin });
+}
+
+async function speedLimitSet() {
+  const kmh = parseFloat(document.getElementById('speedLimitInput').value);
+  if (!kmh || kmh <= 0) {
+    setStatus('❌ Introdu o limită de viteză validă.', 'error');
+    return;
+  }
+  await send('speed_limit_set', { limit_mph: kmh / 1.60934 });
+}
+
+function timeToMinutes(value) {
+  if (!value) return null;
+  const [h, m] = value.split(':').map(Number);
+  return h * 60 + m;
+}
+
+async function saveScheduleDeparture() {
+  const departure = timeToMinutes(document.getElementById('departureTime').value);
+  if (departure == null) {
+    setStatus('❌ Alege o oră de plecare.', 'error');
+    return;
+  }
+  const preconditioning = document.getElementById('preconditionToggle').checked;
+  const offPeak = document.getElementById('offPeakToggle').checked;
+  const offPeakEnd = timeToMinutes(document.getElementById('offPeakEndTime').value) || 0;
+  await send('schedule_departure', {
+    enable: true,
+    departure_time: departure,
+    preconditioning_enabled: preconditioning,
+    off_peak_charging_enabled: offPeak,
+    end_off_peak_time: offPeakEnd,
+  });
+}
+
+async function cancelScheduleDeparture() {
+  await send('schedule_departure', {
+    enable: false,
+    departure_time: 0,
+    preconditioning_enabled: false,
+    off_peak_charging_enabled: false,
+    end_off_peak_time: 0,
+  });
+}
+
+async function loadNearbyCharging() {
+  const list = document.getElementById('nearbyChargingList');
+  list.innerHTML = '<div class="battery-chart-note">Se caută...</div>';
+  try {
+    const r = await apiFetch('/api/nearby-charging');
+    const j = await r.json();
+    if (!j.response) {
+      list.innerHTML = '<div class="battery-chart-note">' + (j.error || 'Eroare necunoscută') + '</div>';
+      return;
+    }
+    const sites = [...(j.response.superchargers || []), ...(j.response.destination_charging || [])];
+    if (!sites.length) {
+      list.innerHTML = '<div class="battery-chart-note">Nicio stație găsită în apropiere.</div>';
+      return;
+    }
+    list.innerHTML = sites.map((s) => {
+      const km = (s.distance_miles * 1.60934).toFixed(1);
+      const stalls = s.available_stalls != null ? `<span>${s.available_stalls}/${s.total_stalls} libere</span>` : '';
+      return `<div class="charging-site"><b>${s.name}</b><span>${km} km</span>${stalls}</div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = '<div class="battery-chart-note">Eroare de rețea.</div>';
+  }
+}
+
+function switchVehicle(vin) {
+  if (vin) window.location.href = '/select-vehicle?vin=' + encodeURIComponent(vin);
+}
+
+async function loadVehicleList() {
+  try {
+    const r = await apiFetch('/api/vehicles');
+    const j = await r.json();
+    if (!Array.isArray(j.vehicles) || j.vehicles.length < 2) return;
+    const select = document.getElementById('vehicleSelect');
+    select.innerHTML = j.vehicles.map((v) =>
+      `<option value="${v.vin}" ${v.vin === j.vin ? 'selected' : ''}>${v.display_name || v.vin}</option>`
+    ).join('');
+    select.style.display = 'inline-block';
+  } catch (e) {}
+}
+
 let autoRefreshTimer = null;
 function setAutoRefresh(seconds) {
   localStorage.setItem('autoRefreshSeconds', seconds);
@@ -502,6 +680,7 @@ setAutoRefresh(savedAutoRefresh);
 refreshStatus();
 renderBatteryHistory();
 checkForUpdate();
+loadVehicleList();
 </script>
 </body>
 </html>

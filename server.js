@@ -500,6 +500,11 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.url.startsWith('/api/command/')) {
       const name = req.url.split('/').pop();
       const { accessToken, vin } = await resolveContext(req);
+      let rawBody = '';
+      req.on('data', (c) => (rawBody += c));
+      await new Promise((resolve) => req.on('end', resolve));
+      let params = {};
+      try { params = JSON.parse(rawBody || '{}'); } catch {}
 
       if (name === 'wake') {
         const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/wake_up`, accessToken);
@@ -528,6 +533,53 @@ const server = http.createServer(async (req, res) => {
         await proxyRequest('POST', `/api/1/vehicles/${vin}/command/auto_conditioning_start`, accessToken);
       }
 
+      if (name === 'valet_on' || name === 'valet_off') {
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/set_valet_mode`, accessToken, {
+          on: name === 'valet_on',
+          password: params.pin,
+        });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      if (name === 'speed_limit_on' || name === 'speed_limit_off') {
+        const cmd = name === 'speed_limit_on' ? 'speed_limit_activate' : 'speed_limit_deactivate';
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/${cmd}`, accessToken, { pin: params.pin });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      if (name === 'speed_limit_set') {
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/speed_limit_set_limit`, accessToken, {
+          limit_mph: params.limit_mph,
+        });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      // set_scheduled_departure is the documented, if now discouraged-in-favor-
+      // of-a-newer-schedule-system, command for "precondition by departure time
+      // + off-peak charging" - the replacement (add_precondition_schedule /
+      // add_charge_schedule) uses an undocumented schedule-object shape, so
+      // this simpler single-shot command is used instead.
+      if (name === 'schedule_departure') {
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/set_scheduled_departure`, accessToken, {
+          enable: params.enable,
+          departure_time: params.departure_time,
+          preconditioning_enabled: params.preconditioning_enabled,
+          preconditioning_weekdays_only: false,
+          off_peak_charging_enabled: params.off_peak_charging_enabled,
+          off_peak_charging_weekdays_only: false,
+          end_off_peak_time: params.end_off_peak_time,
+        });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
       const entry = COMMANDS[name];
       if (!entry) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -549,6 +601,26 @@ const server = http.createServer(async (req, res) => {
       } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
       res.end(r.body);
+      return;
+    }
+
+    if (req.method === 'GET' && req.url === '/api/nearby-charging') {
+      const { accessToken, vin } = await resolveContext(req);
+      const r = await proxyRequest('GET', `/api/1/vehicles/${vin}/nearby_charging_sites`, accessToken);
+      res.writeHead(r.status, { 'Content-Type': 'application/json' });
+      res.end(r.body);
+      return;
+    }
+
+    if (req.method === 'GET' && req.url === '/api/vehicles') {
+      if (!isLocal(req)) {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'forbidden' }));
+        return;
+      }
+      const tokens = loadTokens();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ vehicles: tokens.vehicles || [], vin: tokens.vin || null }));
       return;
     }
 
