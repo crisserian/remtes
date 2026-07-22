@@ -61,6 +61,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.0.9
+- Adăugat: pop-up de confirmare la deschiderea portbagajului spate și a celui față (frunk), la cererea unui user — ca să nu se deschidă din greșeală.
+
 ### 1.0.8
 - Fix: butoanele de sus (baterie/autonomie/blocare/climatizare) nu se actualizau imediat după o comandă reușită de blocare/climatizare — rămâneau cu valoarea veche până la următorul refresh manual.
 - Adăugat: rulare în fundal cu iconiță în system tray — închiderea ferestrei nu mai oprește aplicația, ca notificările de alertă și urmărirea degradării bateriei să funcționeze continuu.
