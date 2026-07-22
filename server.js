@@ -227,6 +227,8 @@ const MIN_TEMP = 15;
 const MAX_TEMP = 28;
 const TEMP_STEP = 0.5;
 const CHARGE_LIMIT_STEP = 5;
+const CHARGE_AMPS_STEP = 1;
+const MIN_CHARGE_AMPS = 5;
 
 async function adjustTemp(accessToken, vin, delta) {
   const dataRes = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data`, accessToken);
@@ -257,6 +259,25 @@ async function adjustChargeLimit(accessToken, vin, delta) {
     percent: next,
   });
   return { status: r.status, body: r.body, newLimit: next };
+}
+
+// Charging current (amps), separate from the charge limit (%) - lowering it
+// reduces the instantaneous power draw during charging (e.g. to stay under
+// a home circuit's breaker rating or spread load with other charging cars).
+async function adjustChargeAmps(accessToken, vin, delta) {
+  const dataRes = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data`, accessToken);
+  const data = JSON.parse(dataRes.body);
+  if (!data.response || !data.response.charge_state) {
+    return { status: dataRes.status, body: dataRes.body };
+  }
+  const cs = data.response.charge_state;
+  const max = cs.charge_current_request_max || cs.charge_amps || 32;
+  const current = cs.charge_current_request != null ? cs.charge_current_request : cs.charge_amps;
+  const next = Math.min(max, Math.max(MIN_CHARGE_AMPS, current + delta));
+  const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/set_charging_amps`, accessToken, {
+    charging_amps: next,
+  });
+  return { status: r.status, body: r.body, newAmps: next };
 }
 
 // ── Battery range history: Tesla doesn't expose a battery-health/degradation
@@ -425,6 +446,13 @@ const server = http.createServer(async (req, res) => {
         const r = await adjustChargeLimit(accessToken, vin, name === 'charge_limit_up' ? CHARGE_LIMIT_STEP : -CHARGE_LIMIT_STEP);
         res.writeHead(r.status, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ...JSON.parse(r.body), newLimit: r.newLimit }));
+        return;
+      }
+
+      if (name === 'charge_amps_up' || name === 'charge_amps_down') {
+        const r = await adjustChargeAmps(accessToken, vin, name === 'charge_amps_up' ? CHARGE_AMPS_STEP : -CHARGE_AMPS_STEP);
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ...JSON.parse(r.body), newAmps: r.newAmps }));
         return;
       }
 

@@ -190,6 +190,16 @@
           <button onclick="adjustChargeLimit(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg></button>
         </div>
       </div>
+      <div class="temp-box">
+        <div class="temp-readout">
+          <span>Curent încărcare (economie)</span>
+        </div>
+        <div class="temp-adjust">
+          <button onclick="adjustChargeAmps(-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg></button>
+          <span class="temp-target" id="chargeAmpsTarget">–</span>
+          <button onclick="adjustChargeAmps(1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg></button>
+        </div>
+      </div>
       <div class="grid">
         <button onclick="send('charge_start')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg>Start</button>
         <button onclick="send('charge_stop')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg>Stop</button>
@@ -423,6 +433,8 @@ function updateExtraData(d) {
   setTpms('tpmsRR', vs.tpms_pressure_rr);
   document.getElementById('chargingState').textContent = cs.charging_state || '–';
   document.getElementById('chargeLimitTarget').textContent = cs.charge_limit_soc != null ? cs.charge_limit_soc + '%' : '–';
+  const amps = cs.charge_current_request != null ? cs.charge_current_request : cs.charge_amps;
+  document.getElementById('chargeAmpsTarget').textContent = amps != null ? amps + ' A' : '–';
 }
 
 async function refreshStatus() {
@@ -527,6 +539,25 @@ async function adjustChargeLimit(direction) {
       setStatus('✅ Limită setată la ' + j.newLimit + '%', 'success');
     } else {
       showCommandError('Limită încărcare', j.response && j.response.reason || JSON.stringify(j));
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
+}
+
+async function adjustChargeAmps(direction) {
+  const cmd = direction > 0 ? 'charge_amps_up' : 'charge_amps_down';
+  setStatus('Reglez curentul de încărcare...', null);
+  try {
+    const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
+    const j = await r.json();
+    if (j.error) {
+      showCommandError('Curent încărcare', j.error);
+    } else if (j.response && j.response.result === true) {
+      document.getElementById('chargeAmpsTarget').textContent = j.newAmps + ' A';
+      setStatus('✅ Curent setat la ' + j.newAmps + ' A', 'success');
+    } else {
+      showCommandError('Curent încărcare', j.response && j.response.reason || JSON.stringify(j));
     }
   } catch (e) {
     setStatus('❌ Eroare de rețea: ' + e, 'error');

@@ -17,7 +17,7 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 - Blocare / deblocare
 - Climate control + scaune / volan încălzite
 - Sentry Mode
-- Pornit / oprit încărcare + limită procent baterie
+- Pornit / oprit încărcare + limită procent baterie + curent de încărcare (economie)
 - Deschis / închis geamuri, portbagaj față/spate, capacul de încărcare
 - Baterie, autonomie, presiune anvelope (cu avertizare la presiune scăzută)
 - Flash faruri, claxon, trezire mașină
@@ -106,6 +106,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
 ## Istoric versiuni
+
+### 1.0.14
+- Adăugat: ajustare curent de încărcare (amperaj), separat de limita procentuală — util pentru economisirea curentului la încărcare (ex. rămânerea sub limita unui circuit electric de acasă).
 
 ### 1.0.13
 Remediere a 4 din 6 puncte dintr-un code review primit pe GitHub (vezi și secțiunile noi din acest README):
