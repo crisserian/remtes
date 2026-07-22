@@ -5,6 +5,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const DIR = __dirname;
+const APP_VERSION = require('./package.json').version;
 
 // DIR (the install/app folder) may not be writable - e.g. a per-machine
 // install under "C:\Program Files\..." requires admin rights to write into.
@@ -554,6 +555,12 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/battery-history') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(loadBatteryHistory()));
+      return;
+    }
+
+    if (req.method === 'GET' && req.url === '/api/app-version') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ version: APP_VERSION }));
       return;
     }
 

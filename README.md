@@ -8,6 +8,7 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 - **Totul rulează local, pe calculatorul tău.** Nu există niciun server intermediar al RemTes care să vadă comenzile tale sau datele mașinii — cererile merg direct din aplicație către API-ul Tesla.
 - **Comenzile către mașină sunt semnate criptografic local**, folosind proxy-ul oficial Tesla (`tesla-http-proxy`, din [teslamotors/vehicle-command](https://github.com/teslamotors/vehicle-command)) — exact mecanismul recomandat de Tesla pentru integrări third-party.
 - Codul sursă e public tocmai ca oricine să poată verifica afirmațiile de mai sus.
+- **Singura excepție**: la pornire, aplicația face un apel către `grumpylabs.ro/remtes/version.txt` doar ca să verifice dacă a apărut o versiune mai nouă — nu trimite niciun fel de date despre tine sau despre mașină, doar citește un fișier text cu numărul versiunii curente.
 
 ## Ce poate face
 
@@ -55,6 +56,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
 ## Istoric versiuni
+
+### 1.0.7
+- Adăugat: la pornire, aplicația verifică `grumpylabs.ro/remtes/version.txt` și arată un banner discret dacă a apărut o versiune mai nouă, cu link direct de descărcare. Nu e o notificare "push" reală (nu există server care să inițieze conexiunea) — este o verificare locală, la fiecare pornire a aplicației.
 
 ### 1.0.6
 - Modificat: eliminată iconița mașinuță de lângă numele „RemTes" din antet.
