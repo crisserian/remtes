@@ -270,6 +270,7 @@
         <span>Stare: <b id="updateStatus">–</b></span>
       </div>
       <div class="grid">
+        <button class="wide" onclick="checkSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>Verifică actualizare</button>
         <button onclick="scheduleSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Instalează acum</button>
         <button onclick="cancelSoftwareUpdate()">Anulează instalarea</button>
       </div>
@@ -735,6 +736,31 @@ async function navigateToSite(lat, long) {
 async function setPassengerSeatHeater(on) {
   const seat_position = parseInt(document.getElementById('seatPositionSelect').value, 10);
   await send('seat_heater_set', { seat_position, on });
+}
+
+async function checkSoftwareUpdate() {
+  setStatus('Verific actualizări...', null);
+  try {
+    const r = await apiFetch('/api/status');
+    const j = await r.json();
+    if (j.response && j.response.vehicle_state) {
+      const vs = j.response.vehicle_state;
+      document.getElementById('firmwareVersion').textContent = vs.car_version || '–';
+      const su = vs.software_update;
+      if (su && su.status) {
+        const statusText = su.status + (su.download_perc ? ` (${su.download_perc}%)` : '');
+        document.getElementById('updateStatus').textContent = statusText;
+        setStatus('✅ Actualizare disponibilă: ' + statusText, 'success');
+      } else {
+        document.getElementById('updateStatus').textContent = 'Fără update disponibil';
+        setStatus('Nicio actualizare disponibilă momentan.', null);
+      }
+    } else if (j.error) {
+      setStatus('❌ ' + j.error, 'error');
+    }
+  } catch (e) {
+    setStatus('❌ Eroare de rețea: ' + e, 'error');
+  }
 }
 
 async function scheduleSoftwareUpdate() {

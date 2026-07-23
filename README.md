@@ -108,6 +108,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.0.16
+- Adăugat: buton „Verifică actualizare" în panoul de actualizare software — interoghează starea curentă a mașinii la cerere, în loc să aștepți următorul refresh general.
+
 ### 1.0.15
 - Adăugat: navigare directă către o stație de încărcare din listă (trimite locația în mașină) + link „Vezi pe hartă" pentru fiecare stație. Notă tehnică: comanda de navigare merge direct către API-ul Tesla, nu prin proxy-ul local de semnare, care o respinge.
 - Adăugat: scaune încălzite pentru orice poziție (pasager față, spate stânga/centru/dreapta) — nu doar șofer, ca înainte.
