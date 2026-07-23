@@ -11,7 +11,7 @@
     --accent: #6c63ff; --accent2: #00d4aa; --danger: #ff6b6b; --gold: #f59e0b;
     --text: #e8e8f0; --muted: #888899;
     --c-safety: #85b7eb; --c-climate: #5dcaa5; --c-charging: #97c459; --c-trunk: #f0997b;
-    --c-valet: #e08fb0; --c-schedule: #b8a9f5; --c-nearby: #7fd4e0;
+    --c-valet: #e08fb0; --c-schedule: #b8a9f5; --c-nearby: #7fd4e0; --c-update: #f5c26b;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
@@ -52,12 +52,17 @@
   .panel-schedule .panel-title { color: var(--c-schedule); }
   .panel-nearby { border-color: rgba(127,212,224,.25); }
   .panel-nearby .panel-title { color: var(--c-nearby); }
+  .panel-update { border-color: rgba(245,194,107,.25); }
+  .panel-update .panel-title { color: var(--c-update); }
   .pin-input, .time-input, .num-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .5rem; font-size: .8rem; width: 100%; margin-bottom: .5rem; }
   .field-row { display: flex; align-items: center; gap: .5rem; font-size: .75rem; color: var(--muted); margin-bottom: .5rem; }
   .field-row label { flex: 1; }
-  .charging-site { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .5rem .6rem; margin-bottom: .4rem; font-size: .75rem; display: flex; justify-content: space-between; gap: .5rem; }
+  .charging-site { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .5rem .6rem; margin-bottom: .4rem; font-size: .75rem; }
+  .charging-site-info { display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .35rem; }
   .charging-site b { color: var(--text); }
   .charging-site span { color: var(--muted); }
+  .charging-site-actions { display: flex; gap: .4rem; }
+  .charging-site-actions button, .charging-site-actions a { flex: 1; padding: .35rem; font-size: .7rem; }
   .vehicle-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .3rem .5rem; font-size: .75rem; margin-right: .6rem; }
   .tpms-cell b.low { color: var(--danger); }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
@@ -175,6 +180,16 @@
         <button class="toggle-btn" id="toggleSeat" onclick="toggleFeature('seat')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></svg><span>Scaun: –</span></button>
         <button class="toggle-btn" id="toggleSteering" onclick="toggleFeature('steering')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg><span>Volan: –</span></button>
       </div>
+      <select class="pin-input" id="seatPositionSelect" style="margin-top:.5rem">
+        <option value="1">Scaun încălzit: Pasager față</option>
+        <option value="2">Scaun încălzit: Spate stânga</option>
+        <option value="4">Scaun încălzit: Spate centru</option>
+        <option value="5">Scaun încălzit: Spate dreapta</option>
+      </select>
+      <div class="grid">
+        <button onclick="setPassengerSeatHeater(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></svg>Pornește</button>
+        <button onclick="setPassengerSeatHeater(false)">Oprește</button>
+      </div>
     </div>
 
     <div class="panel panel-charging">
@@ -248,6 +263,18 @@
       <div id="nearbyChargingList" style="margin-top:.5rem"></div>
     </div>
 
+    <div class="panel panel-update">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Actualizare software</div>
+      <div class="temp-readout" style="margin-bottom:.5rem">
+        <span>Versiune: <b id="firmwareVersion">–</b></span>
+        <span>Stare: <b id="updateStatus">–</b></span>
+      </div>
+      <div class="grid">
+        <button onclick="scheduleSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Instalează acum</button>
+        <button onclick="cancelSoftwareUpdate()">Anulează instalarea</button>
+      </div>
+    </div>
+
     <div class="panel wide-panel" id="batteryHistoryPanel" style="display:none">
       <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6l4 -4l8 8" /><path d="M21 10l0 7l-7 0" /></svg>Autonomie la 100% (istoric)</div>
       <div id="batteryHistoryChart"></div>
@@ -295,6 +322,8 @@ const LABELS = {
   valet_on: 'Valet Mode ON', valet_off: 'Valet Mode OFF',
   speed_limit_on: 'Limită viteză ON', speed_limit_off: 'Limită viteză OFF', speed_limit_set: 'Setare limită viteză',
   schedule_departure: 'Plecare programată',
+  navigate_to: 'Navigare', seat_heater_set: 'Scaun încălzit',
+  software_update_schedule: 'Programare update', software_update_cancel: 'Anulare update',
 };
 const TPMS_LOW_BAR = 2.2;
 
@@ -468,6 +497,12 @@ async function refreshStatus() {
       }
       if (d.charge_state) {
         renderToggle('chargePort', !!d.charge_state.charge_port_door_open);
+      }
+      if (d.vehicle_state) {
+        document.getElementById('firmwareVersion').textContent = d.vehicle_state.car_version || '–';
+        const su = d.vehicle_state.software_update;
+        const statusText = su && su.status ? su.status + (su.download_perc ? ` (${su.download_perc}%)` : '') : 'Fără update disponibil';
+        document.getElementById('updateStatus').textContent = statusText;
       }
     } else if (j.error) {
       setStatus('❌ ' + j.error, 'error');
@@ -678,11 +713,36 @@ async function loadNearbyCharging() {
     list.innerHTML = sites.map((s) => {
       const km = (s.distance_miles * 1.60934).toFixed(1);
       const stalls = s.available_stalls != null ? `<span>${s.available_stalls}/${s.total_stalls} libere</span>` : '';
-      return `<div class="charging-site"><b>${s.name}</b><span>${km} km</span>${stalls}</div>`;
+      const lat = s.location.lat, long = s.location.long;
+      const mapsUrl = `https://maps.google.com/maps?q=${lat},${long}`;
+      return `<div class="charging-site">
+        <div class="charging-site-info"><b>${s.name}</b><span>${km} km</span>${stalls}</div>
+        <div class="charging-site-actions">
+          <button onclick="navigateToSite(${lat}, ${long})">Navighează</button>
+          <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">Vezi pe hartă</a>
+        </div>
+      </div>`;
     }).join('');
   } catch (e) {
     list.innerHTML = '<div class="battery-chart-note">Eroare de rețea.</div>';
   }
+}
+
+async function navigateToSite(lat, long) {
+  await send('navigate_to', { lat, long });
+}
+
+async function setPassengerSeatHeater(on) {
+  const seat_position = parseInt(document.getElementById('seatPositionSelect').value, 10);
+  await send('seat_heater_set', { seat_position, on });
+}
+
+async function scheduleSoftwareUpdate() {
+  await send('software_update_schedule', { offset_sec: 0 });
+}
+
+async function cancelSoftwareUpdate() {
+  await send('software_update_cancel');
 }
 
 function switchVehicle(vin) {

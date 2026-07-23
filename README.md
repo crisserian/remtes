@@ -15,7 +15,7 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 ## Ce poate face
 
 - Blocare / deblocare
-- Climate control + scaune / volan încălzite
+- Climate control + scaune (toate poziţiile) / volan încălzite
 - Sentry Mode
 - Pornit / oprit încărcare + limită procent baterie + curent de încărcare (economie)
 - Deschis / închis geamuri, portbagaj față/spate, capacul de încărcare
@@ -23,7 +23,8 @@ Aplicație gratuită pentru Windows care îți permite să controlezi mașina Te
 - Flash faruri, claxon, trezire mașină
 - Valet Mode și limitare de viteză cu PIN
 - Plecare programată (preîncălzire + încărcare cu tarif redus)
-- Stații de încărcare din apropiere
+- Stații de încărcare din apropiere, cu navigare directă către mașină și link către hartă
+- Informații actualizare software (versiune, stare) + programare/anulare instalare
 - Notificare la alerte noi ale mașinii, urmărirea degradării bateriei în timp, verificare automată de versiune noi
 
 ## Cum funcționează
@@ -106,6 +107,11 @@ npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
 ## Istoric versiuni
+
+### 1.0.15
+- Adăugat: navigare directă către o stație de încărcare din listă (trimite locația în mașină) + link „Vezi pe hartă" pentru fiecare stație. Notă tehnică: comanda de navigare merge direct către API-ul Tesla, nu prin proxy-ul local de semnare, care o respinge.
+- Adăugat: scaune încălzite pentru orice poziție (pasager față, spate stânga/centru/dreapta) — nu doar șofer, ca înainte.
+- Adăugat: panou „Actualizare software" — arată versiunea de firmware curentă și starea unui update în curs, cu opțiune de a-l instala imediat sau anula.
 
 ### 1.0.14
 - Adăugat: ajustare curent de încărcare (amperaj), separat de limita procentuală — util pentru economisirea curentului la încărcare (ex. rămânerea sub limita unui circuit electric de acasă).

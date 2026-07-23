@@ -223,6 +223,37 @@ function proxyRequest(method, urlPath, accessToken, bodyObj) {
   });
 }
 
+const FLEET_API_HOST = 'fleet-api.prd.eu.vn.cloud.tesla.com';
+
+// Not every command needs the vehicle-command signing proxy - sharing a
+// navigation destination is a plain REST call Tesla's cloud accepts
+// directly with just the OAuth Bearer token (confirmed: routing it through
+// the local proxy instead fails with "command requires using the REST API").
+function fleetApiRequest(method, urlPath, accessToken, bodyObj) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: FLEET_API_HOST,
+        port: 443,
+        path: urlPath,
+        method,
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+        },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (c) => (data += c));
+        res.on('end', () => resolve({ status: res.statusCode, body: data }));
+      }
+    );
+    req.on('error', reject);
+    if (method === 'POST') req.write(JSON.stringify(bodyObj || {}));
+    req.end();
+  });
+}
+
 const MIN_TEMP = 15;
 const MAX_TEMP = 28;
 const TEMP_STEP = 0.5;
@@ -504,6 +535,57 @@ const server = http.createServer(async (req, res) => {
           off_peak_charging_weekdays_only: false,
           end_off_peak_time: params.end_off_peak_time,
         });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      // Shares a Google Maps link with the in-vehicle navigation system -
+      // the same mechanism as "share to car" from a phone. Works for any
+      // location (superchargers and destination chargers alike), so no
+      // need for navigation_sc_request's supercharger-specific ID format.
+      // Goes straight to Tesla's Fleet API (see fleetApiRequest) - the
+      // local signing proxy rejects this specific command.
+      if (name === 'navigate_to') {
+        const r = await fleetApiRequest('POST', `/api/1/vehicles/${vin}/command/navigation_request`, accessToken, {
+          type: 'share_ext_content_raw',
+          locale: 'ro-RO',
+          timestamp_ms: String(Date.now()),
+          value: { 'android.intent.extra.TEXT': `https://maps.google.com/maps?q=${params.lat},${params.long}` },
+        });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      // Generalized seat heater for any seat position (driver is already
+      // covered by the seat_heater_on/off toggle above, which is left
+      // untouched). Positions: 0 driver, 1 front passenger, 2 rear left,
+      // 4 rear center, 5 rear right (3 is not a valid position).
+      if (name === 'seat_heater_set') {
+        if (params.on) {
+          await proxyRequest('POST', `/api/1/vehicles/${vin}/command/auto_conditioning_start`, accessToken);
+        }
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/remote_seat_heater_request`, accessToken, {
+          seat_position: params.seat_position,
+          level: params.on ? 3 : 0,
+        });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      if (name === 'software_update_schedule') {
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/schedule_software_update`, accessToken, {
+          offset_sec: params.offset_sec,
+        });
+        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+        res.end(r.body);
+        return;
+      }
+
+      if (name === 'software_update_cancel') {
+        const r = await proxyRequest('POST', `/api/1/vehicles/${vin}/command/cancel_software_update`, accessToken);
         res.writeHead(r.status, { 'Content-Type': 'application/json' });
         res.end(r.body);
         return;
