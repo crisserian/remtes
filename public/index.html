@@ -17,10 +17,10 @@
   html, body { height: 100%; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 1rem; overflow-y: auto; }
   svg { display: block; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; width: 100%; max-width: 1360px; display: flex; flex-direction: column; margin: auto 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 1.1rem 1.5rem; width: 100%; max-width: 1700px; display: flex; flex-direction: column; margin: auto 0; }
   .brand { display: flex; align-items: center; gap: .6rem; }
   h1 { font-size: 1.05rem; margin: 0; font-weight: 700; letter-spacing: .2px; }
-  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .85rem; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; }
   .logout-btn { color: var(--muted); font-size: .78rem; text-decoration: none; display: flex; align-items: center; gap: .3rem; }
   .logout-btn:hover { color: var(--text); }
   .status { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .6rem .8rem; margin-bottom: .6rem; font-size: .8rem; color: #c5c5d2; min-height: 1.2rem; }
@@ -28,16 +28,16 @@
   .status.error { border-color: rgba(255,107,107,.4); color: var(--danger); }
   .update-banner { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.35); color: var(--gold); border-radius: 10px; padding: .6rem .8rem; margin-bottom: .6rem; font-size: .8rem; }
   .update-banner a { color: var(--gold); font-weight: 700; text-decoration: underline; }
-  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: .85rem; }
-  .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .55rem .3rem; text-align: center; }
+  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: .6rem; }
+  .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .4rem .3rem; text-align: center; }
   .stat-icon { color: var(--accent2); margin: 0 auto .3rem; width: 16px; height: 16px; }
   .stat-value { font-size: .92rem; font-weight: 700; }
   .stat-label { font-size: .65rem; color: var(--muted); margin-top: .1rem; }
-  .panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; }
-  .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: .85rem; }
+  .panels { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; }
+  .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: .65rem; }
   .wide-panel { grid-column: 1 / -1; }
   .battery-chart-note { font-size: .7rem; color: var(--muted); margin-top: .4rem; }
-  .panel-title { display: flex; align-items: center; gap: .45rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-bottom: .6rem; }
+  .panel-title { display: flex; align-items: center; gap: .45rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; margin-bottom: .4rem; }
   .panel-safety { border-color: rgba(133,183,235,.25); }
   .panel-safety .panel-title { color: var(--c-safety); }
   .panel-climate { border-color: rgba(93,202,165,.25); }
@@ -76,7 +76,7 @@
   .refresh-btn { margin-top: .85rem; width: 100%; background: var(--accent); color: white; border: none; padding: .7rem; border-radius: 10px; font-weight: 700; cursor: pointer; }
   .donate-link { display: flex; align-items: center; justify-content: center; gap: .35rem; text-align: center; margin-top: .85rem; color: var(--gold); font-size: .8rem; text-decoration: none; font-weight: 600; }
   .donate-link:hover { text-decoration: underline; }
-  .tpms-box { margin-bottom: .85rem; }
+  .tpms-box { margin-bottom: .6rem; }
   .tpms-title { display: flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--muted); margin-bottom: .35rem; }
   .tpms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; max-width: 260px; }
   .tpms-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .4rem .55rem; font-size: .7rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
@@ -90,7 +90,11 @@
   .temp-adjust button { width: 2.1rem; height: 2.1rem; border-radius: 50%; padding: 0; }
   .temp-target { font-size: 1.05rem; font-weight: 700; min-width: 3.6rem; text-align: center; }
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1500px) {
+    .panels { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 1100px) {
     .panels { grid-template-columns: 1fr 1fr; }
   }
 
@@ -257,12 +261,6 @@
       </div>
     </div>
 
-    <div class="panel wide-panel panel-nearby">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Stații de încărcare din apropiere</div>
-      <button class="wide" onclick="loadNearbyCharging()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Caută stații</button>
-      <div id="nearbyChargingList" style="margin-top:.5rem"></div>
-    </div>
-
     <div class="panel panel-update">
       <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Actualizare software</div>
       <div class="temp-readout" style="margin-bottom:.5rem">
@@ -274,6 +272,12 @@
         <button onclick="scheduleSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Instalează acum</button>
         <button onclick="cancelSoftwareUpdate()">Anulează instalarea</button>
       </div>
+    </div>
+
+    <div class="panel wide-panel panel-nearby">
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Stații de încărcare din apropiere</div>
+      <button class="wide" onclick="loadNearbyCharging()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Caută stații</button>
+      <div id="nearbyChargingList" style="margin-top:.5rem"></div>
     </div>
 
     <div class="panel wide-panel" id="batteryHistoryPanel" style="display:none">
