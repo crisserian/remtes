@@ -108,6 +108,9 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.0.18
+- Modificat: dashboard-ul e împărțit acum în două file — „Principal" (acces & siguranță, climatizare, încărcare, portbagaj) și „Avansat" (valet, plecare programată, stații de încărcare, actualizare software). Rezolvă scroll-ul excesiv pe ecrane mai mici (testat la 1366×768: de la ~600px overflow la ~20px pe fila Principal). Alegerea filei se reține între sesiuni.
+
 ### 1.0.17
 - Modificat: fereastra folosește mai bine spațiul orizontal pe ecrane late — panourile se așază pe 4 coloane (în loc de 3), lățimea maximă a crescut, iar panoul „Actualizare software" a fost reordonat să nu mai stea singur pe un rând întreg. Spațiere ușor redusă peste tot, ca să încapă mai mult fără scroll vertical.
 
