@@ -3,7 +3,7 @@
 Free Windows app that lets you control your Tesla directly from your computer, through Tesla's official Fleet API.
 *(Aplicație gratuită pentru Windows care îți permite să controlezi mașina Tesla direct de pe calculator, prin API-ul oficial Tesla Fleet.)*
 
-## De ce e sigur
+## Why it's safe / De ce e sigur
 
 **English**
 - **You log in with your own Tesla account** (official Tesla OAuth) — RemTes never sees or stores your account password.
@@ -23,7 +23,7 @@ Free Windows app that lets you control your Tesla directly from your computer, t
 - **`tesla-http-proxy.exe` se poate reconstrui local**, din sursa oficială Tesla, nu doar "ai încredere" într-un binar precompilat — vezi [Build din sursă](#build-din-sursă).
 - **Domeniul `testrace.netlify.app`** din fluxul OAuth e explicat și documentat integral, cu sursa exactă a paginii — vezi [De ce testrace.netlify.app?](#de-ce-testracenetlifyapp).
 
-## Ce poate face
+## What it can do / Ce poate face
 
 **English**
 - Lock / unlock
@@ -55,7 +55,7 @@ Free Windows app that lets you control your Tesla directly from your computer, t
 - Notificare la alerte noi ale mașinii, urmărirea degradării bateriei în timp, verificare automată de versiune noi
 - Interfață disponibilă în 9 limbi (română, engleză, germană, franceză, maghiară, italiană, spaniolă, portugheză, olandeză)
 
-## Cum funcționează
+## How it works / Cum funcționează
 
 **English**
 1. On first run, you log in with your Tesla account (the official Tesla page, not a fake one).
@@ -67,7 +67,8 @@ Free Windows app that lets you control your Tesla directly from your computer, t
 2. Aplicația primește de la Tesla un token de acces valabil doar pentru contul tău, stocat local pe calculatorul tău (`app.getPath('userData')`), nu într-o bază de date externă.
 3. Când apeși un buton, aplicația trimite comanda către mașină prin proxy-ul de semnare local (`127.0.0.1`), apoi către API-ul Tesla.
 
-## De ce `testrace.netlify.app`?
+<a name="de-ce-testracenetlifyapp"></a>
+## Why `testrace.netlify.app`? / De ce `testrace.netlify.app`?
 
 **English:** Tesla requires the OAuth flow's `redirect_uri` to be a verified HTTPS domain — it doesn't accept `localhost` directly. `testrace.netlify.app` is a static site hosted by me (the RemTes developer) on Netlify, used **exclusively** as a redirect relay: it receives the authorization code from Tesla and immediately forwards it, in your own browser, to `http://localhost:5750`, with no additional network call. The code never reaches any server — the page just rewrites the URL in your own browser.
 
@@ -97,13 +98,14 @@ You don't have to take my word for it — this is the entire content of the page
 
 **Română:** (Ramura `else` se referă la un relay personal, mai vechi, care nu mai există - RemTes generează întotdeauna un `state` care începe cu `local`, deci ia mereu prima ramură.)
 
-## Instalare (pentru utilizatori)
+## Installation (for users) / Instalare (pentru utilizatori)
 
 **English:** Download the installer from [grumpylabs.ro/remtes](https://www.grumpylabs.ro/remtes/). Windows may show a SmartScreen warning because the app doesn't have a paid signing certificate — click "More info" → "Run anyway".
 
 **Română:** Descarcă installerul de pe [grumpylabs.ro/remtes](https://www.grumpylabs.ro/remtes/). Windows poate arăta un avertisment SmartScreen deoarece aplicația nu are un certificat de semnare plătit — apasă „More info" → „Run anyway".
 
-## Build din sursă
+<a name="build-din-sursă"></a>
+## Build from source / Build din sursă
 
 **English:** You need your own Tesla Developer app ([developer.tesla.com](https://developer.tesla.com)) with:
 - a `client_id` and `client_secret` (OAuth)
@@ -159,7 +161,7 @@ npm start          # rulează în Electron, pentru testare
 npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
-## Istoric versiuni / Version history
+## Version history / Istoric versiuni
 
 ### 1.1.2
 - **RO:** Fix: mesajul brut al API-ului Tesla „vehicle unavailable: vehicle is offline or asleep" apărea netradus, în engleză, indiferent de limba aleasă. Acum e recunoscut și tradus în toate cele 9 limbi, iar dacă utilizatorul schimbă limba în timp ce mesajul e afișat, acesta se re-randează automat în limba nouă.
@@ -278,7 +280,7 @@ Remediere a 4 din 6 puncte dintr-un code review primit pe GitHub / *Fixed 4 out 
 - **RO:** Securitate: protecție CSRF pe comenzile locale, escapare XSS pe datele venite din contul Tesla, protecție login-CSRF prin `state` OAuth aleator cu validare single-use.
 - **EN:** Security: CSRF protection on local commands, XSS escaping on data coming from the Tesla account, login-CSRF protection via a random OAuth `state` with single-use validation.
 
-## Licență
+## License / Licență
 
 **English:** No explicit license at the moment — code made available for transparency and user-verification purposes only.
 
