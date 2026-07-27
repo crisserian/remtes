@@ -38,7 +38,7 @@ Free Windows app that lets you control your Tesla directly from your computer, t
 - Nearby charging stations, with direct navigation to the vehicle and a map link
 - Software update info (version, status) + schedule/cancel installation
 - Notification on new vehicle alerts, battery degradation tracking over time, automatic new-version check
-- Interface available in 9 languages (English, Romanian, German, French, Hungarian, Italian, Spanish, Portuguese, Dutch)
+- Interface available in 10 languages (English, Romanian, German, French, Hungarian, Italian, Spanish, Portuguese, Dutch, Greek)
 
 **Română**
 - Blocare / deblocare
@@ -53,7 +53,7 @@ Free Windows app that lets you control your Tesla directly from your computer, t
 - Stații de încărcare din apropiere, cu navigare directă către mașină și link către hartă
 - Informații actualizare software (versiune, stare) + programare/anulare instalare
 - Notificare la alerte noi ale mașinii, urmărirea degradării bateriei în timp, verificare automată de versiune noi
-- Interfață disponibilă în 9 limbi (română, engleză, germană, franceză, maghiară, italiană, spaniolă, portugheză, olandeză)
+- Interfață disponibilă în 10 limbi (română, engleză, germană, franceză, maghiară, italiană, spaniolă, portugheză, olandeză, greacă)
 
 ## How it works / Cum funcționează
 
@@ -162,6 +162,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 ```
 
 ## Version history / Istoric versiuni
+
+### 1.1.3
+- **RO:** Adăugat: greaca (Ελληνικά) ca a 10-a limbă a interfeței, selectabilă la prima pornire și din antet.
+- **EN:** Added: Greek (Ελληνικά) as the app's 10th interface language, selectable on first run and from the header.
 
 ### 1.1.2
 - **RO:** Fix: mesajul brut al API-ului Tesla „vehicle unavailable: vehicle is offline or asleep" apărea netradus, în engleză, indiferent de limba aleasă. Acum e recunoscut și tradus în toate cele 9 limbi, iar dacă utilizatorul schimbă limba în timp ce mesajul e afișat, acesta se re-randează automat în limba nouă.

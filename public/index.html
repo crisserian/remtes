@@ -134,6 +134,7 @@
       <button class="lang-btn" onclick="selectInitialLanguage('es')">Español</button>
       <button class="lang-btn" onclick="selectInitialLanguage('pt')">Português</button>
       <button class="lang-btn" onclick="selectInitialLanguage('nl')">Nederlands</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('el')">Ελληνικά</button>
     </div>
   </div>
 </div>
@@ -154,6 +155,7 @@
         <option value="es">Español</option>
         <option value="pt">Português</option>
         <option value="nl">Nederlands</option>
+        <option value="el">Ελληνικά</option>
       </select>
       <a href="/logout" class="logout-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /><path d="M15 12h-12l3 -3" /><path d="M6 15l-3 -3" /></svg><span data-i18n="logout">Ieșire</span></a>
     </div>
@@ -826,6 +828,59 @@ const TRANSLATIONS = {
     msg_checking_update: 'Controleren op updates...', msg_update_available: 'Update beschikbaar: {status}', msg_no_update_now: 'Op dit moment geen update beschikbaar.',
     msg_vehicle_offline: 'voertuig niet beschikbaar: het voertuig is offline of in slaapstand',
     state_on: 'Aan', state_off: 'Uit', lang_picker_title: 'Kies je taal',
+  },
+  el: {
+    logout: 'Αποσύνδεση', status_loading: 'Φόρτωση...',
+    stat_battery: 'μπαταρία', stat_range: 'αυτονομία', stat_access: 'πρόσβαση', stat_climate: 'κλιματισμός',
+    tpms_title: 'Πίεση ελαστικών (Bar)', tpms_fl: 'Εμπρός αριστερά', tpms_fr: 'Εμπρός δεξιά', tpms_rl: 'Πίσω αριστερά', tpms_rr: 'Πίσω δεξιά',
+    tab_main: 'Κύριο', tab_advanced: 'Σύνθετες ρυθμίσεις',
+    panel_safety_title: 'Πρόσβαση & ασφάλεια', panel_climate_title: 'Κλιματισμός', panel_charging_title: 'Φόρτιση', panel_trunk_title: 'Πορτ-μπαγκάζ',
+    panel_valet_title: 'Λειτουργία Valet & όριο ταχύτητας', panel_schedule_title: 'Προγραμματισμένη αναχώρηση', panel_update_title: 'Ενημέρωση λογισμικού',
+    panel_nearby_title: 'Κοντινοί σταθμοί φόρτισης', panel_history_title: 'Αυτονομία στο 100% (ιστορικό)',
+    btn_wake: 'Αφύπνιση οχήματος', btn_flash: 'Αναβοσβήσιμο φώτων', btn_honk: 'Κόρνα',
+    toggle_windows_label: 'Παράθυρα', state_windows_closed: 'Κλειστά', state_windows_open: 'Ανοιχτά',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Κλείδωμα', state_lock_locked: 'Κλειδωμένο', state_lock_unlocked: 'Ξεκλείδωτο',
+    label_in: 'Μέσα', label_out: 'Έξω', toggle_climate_label: 'Κλιματισμός', toggle_seat_label: 'Κάθισμα', toggle_steering_label: 'Τιμόνι',
+    seat_opt_1: 'Θέρμανση καθίσματος: Συνοδηγός', seat_opt_2: 'Θέρμανση καθίσματος: Πίσω αριστερά', seat_opt_4: 'Θέρμανση καθίσματος: Πίσω κέντρο', seat_opt_5: 'Θέρμανση καθίσματος: Πίσω δεξιά',
+    btn_start: 'Ενεργοποίηση', btn_stop: 'Απενεργοποίηση',
+    label_limit: 'Όριο', label_state: 'Κατάσταση', label_charge_amps: 'Ρεύμα φόρτισης (οικονομία)', btn_charge_start: 'Έναρξη', btn_charge_stop: 'Διακοπή',
+    toggle_chargeport_label: 'Θύρα φόρτισης', state_port_open: 'Ανοιχτή', state_port_closed: 'Κλειστή',
+    btn_trunk_rear: 'Πίσω πορτ-μπαγκάζ', confirm_trunk_rear: 'Άνοιγμα πίσω πορτ-μπαγκάζ;',
+    btn_trunk_front: 'Μπροστινό πορτ-μπαγκάζ (frunk)', confirm_trunk_front: 'Άνοιγμα μπροστινού πορτ-μπαγκάζ (frunk);',
+    ph_pin: 'PIN (4 ψηφία)', btn_valet_on: 'Ενεργοποίηση λειτουργίας Valet', btn_valet_off: 'Απενεργοποίηση λειτουργίας Valet',
+    ph_speed_limit: 'Όριο ταχύτητας (χλμ/ώ)', btn_speedlimit_on: 'Ενεργοποίηση ορίου', btn_speedlimit_off: 'Απενεργοποίηση ορίου', btn_speedlimit_set: 'Ορισμός ορίου',
+    label_precondition: 'Προθέρμανση καμπίνας πριν την αναχώρηση', label_offpeak: 'Φόρτιση εκτός αιχμής (off-peak)', title_offpeak_end: 'Ώρα λήξης του χαμηλού τιμολογίου',
+    btn_save_schedule: 'Αποθήκευση προγραμματισμού', btn_cancel_schedule: 'Ακύρωση προγραμματισμού',
+    label_version: 'Έκδοση', btn_check_update: 'Έλεγχος για ενημέρωση', btn_install_update: 'Εγκατάσταση τώρα', btn_cancel_update: 'Ακύρωση εγκατάστασης',
+    btn_search_stations: 'Αναζήτηση σταθμών', msg_searching: 'Αναζήτηση...', msg_no_stations: 'Δεν βρέθηκαν σταθμοί σε κοντινή απόσταση.', msg_network_error_dot: 'Σφάλμα δικτύου.',
+    label_stalls_free: 'ελεύθερες', btn_navigate: 'Πλοήγηση', btn_view_map: 'Προβολή στον χάρτη', msg_unknown_error: 'Άγνωστο σφάλμα',
+    msg_history_note: 'Καταγράφεται αυτόματα την επόμενη φορά που το αυτοκίνητο φτάσει σε φόρτιση 100%. Απαιτούνται τουλάχιστον 2 σημεία δεδομένων για να εμφανιστεί μια τάση.',
+    btn_refresh: 'Ανανέωση κατάστασης', label_autorefresh: 'Αυτόματη ανανέωση:',
+    opt_off: 'Ανενεργό', opt_30s: '30 δευτερόλεπτα', opt_1m: '1 λεπτό', opt_3m: '3 λεπτά', opt_5m: '5 λεπτά', opt_10m: '10 λεπτά',
+    btn_donate: 'Κάνε δωρεά για να στηρίξεις το project',
+    label_lock: 'Κλείδωμα', label_unlock: 'Ξεκλείδωμα', label_climate_on: 'Κλιματισμός ΕΝΕΡΓΟΣ', label_climate_off: 'Κλιματισμός ΑΝΕΝΕΡΓΟΣ',
+    label_wake: 'Αφύπνιση οχήματος', label_vent_windows: 'Άνοιγμα παραθύρων', label_close_windows: 'Κλείσιμο παραθύρων',
+    label_charge_start: 'Έναρξη φόρτισης', label_charge_stop: 'Διακοπή φόρτισης', label_charge_port_open: 'Άνοιγμα θύρας φόρτισης', label_charge_port_close: 'Κλείσιμο θύρας φόρτισης',
+    label_sentry_on: 'Λειτουργία Sentry ΕΝΕΡΓΗ', label_sentry_off: 'Λειτουργία Sentry ΑΝΕΝΕΡΓΗ',
+    label_seat_heater_on: 'Θέρμανση καθίσματος ΕΝΕΡΓΗ', label_seat_heater_off: 'Θέρμανση καθίσματος ΑΝΕΝΕΡΓΗ',
+    label_steering_heater_on: 'Θέρμανση τιμονιού ΕΝΕΡΓΗ', label_steering_heater_off: 'Θέρμανση τιμονιού ΑΝΕΝΕΡΓΗ',
+    label_valet_on: 'Λειτουργία Valet ΕΝΕΡΓΗ', label_valet_off: 'Λειτουργία Valet ΑΝΕΝΕΡΓΗ',
+    label_speed_limit_on: 'Όριο ταχύτητας ΕΝΕΡΓΟ', label_speed_limit_off: 'Όριο ταχύτητας ΑΝΕΝΕΡΓΟ', label_speed_limit_set: 'Ορισμός ορίου ταχύτητας',
+    label_navigate_to: 'Πλοήγηση', label_seat_heater_set: 'Θέρμανση καθίσματος',
+    label_software_update_schedule: 'Προγραμματισμός ενημέρωσης', label_software_update_cancel: 'Ακύρωση ενημέρωσης',
+    label_temperature: 'Θερμοκρασία', label_charge_limit: 'Όριο φόρτισης', label_charge_current: 'Ρεύμα φόρτισης',
+    msg_sending: 'Αποστολή', msg_success_suffix: '— επιτυχία', msg_unknown_reason: 'άγνωστος λόγος', msg_network_error_prefix: 'Σφάλμα δικτύου',
+    msg_virtual_key_error: '{label}: το εικονικό κλειδί δεν έχει συνδεθεί με το όχημα. Στο κινητό σου, με την εφαρμογή Tesla ανοιχτή και κοντά στο αυτοκίνητο, άνοιξε το {url} και πάτησε "Add Key".',
+    msg_wake_sent: 'Η αφύπνιση στάλθηκε', msg_state_suffix: '(κατάσταση: {state})',
+    msg_updating: 'Ανανέωση...', msg_updated: 'Ανανεώθηκε.', msg_no_update: 'Καμία ενημέρωση διαθέσιμη',
+    msg_new_version: 'Υπάρχει διαθέσιμη νέα έκδοση ({version}).', btn_download: 'Λήψη',
+    msg_adjusting_temp: 'Ρύθμιση θερμοκρασίας...', msg_set_to: 'Ορίστηκε σε {value}',
+    msg_adjusting_charge_limit: 'Ρύθμιση ορίου φόρτισης...', msg_limit_set_to: 'Το όριο ορίστηκε σε {value}',
+    msg_adjusting_charge_amps: 'Ρύθμιση ρεύματος φόρτισης...', msg_amps_set_to: 'Το ρεύμα ορίστηκε σε {value}',
+    msg_invalid_pin: 'Εισάγετε PIN 4 ψηφίων.', msg_invalid_speed_limit: 'Εισάγετε έγκυρο όριο ταχύτητας.', msg_choose_departure_time: 'Επιλέξτε ώρα αναχώρησης.',
+    msg_checking_update: 'Έλεγχος για ενημερώσεις...', msg_update_available: 'Διαθέσιμη ενημέρωση: {status}', msg_no_update_now: 'Καμία ενημέρωση διαθέσιμη αυτή τη στιγμή.',
+    msg_vehicle_offline: 'το όχημα δεν είναι διαθέσιμο: είναι εκτός σύνδεσης ή σε αδράνεια',
+    state_on: 'Ενεργό', state_off: 'Ανενεργό', lang_picker_title: 'Επίλεξε γλώσσα',
   },
 };
 
