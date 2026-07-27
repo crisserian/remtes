@@ -108,6 +108,18 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Istoric versiuni
 
+### 1.1.2
+- **RO:** Fix: mesajul brut al API-ului Tesla „vehicle unavailable: vehicle is offline or asleep" apărea netradus, în engleză, indiferent de limba aleasă. Acum e recunoscut și tradus în toate cele 9 limbi, iar dacă utilizatorul schimbă limba în timp ce mesajul e afișat, acesta se re-randează automat în limba nouă.
+- **EN:** Fix: the raw Tesla API message "vehicle unavailable: vehicle is offline or asleep" was shown untranslated regardless of the selected language. It's now recognized and translated into all 9 languages, and re-renders automatically if the user switches language while it's displayed.
+
+### 1.1.1
+- **RO:** Fix: butoanele toggle (Geamuri, Sentry, Blocare, Climatizare, Scaun, Volan, Capac priză) rămâneau în română când mașina era offline/adormită, pentru că textul lor era actualizat doar după un răspuns reușit de status. Acum toate butoanele toggle, statusul de update, istoricul de baterie și lista de stații din apropiere se re-randează complet la schimbarea limbii, indiferent dacă mașina răspunde sau nu.
+- **EN:** Fix: toggle buttons (Windows, Sentry, Lock, Climate, Seat, Steering wheel, Charge port) stayed in Romanian whenever the vehicle was offline/asleep, since their text only updated after a successful status response. All toggle buttons, the update status, the battery history note, and the nearby-charging list now fully re-render on language switch regardless of vehicle connectivity.
+
+### 1.1.0
+- **RO:** Adăugat: suport complet multi-limbă — română, engleză, germană, franceză, maghiară, italiană, spaniolă, portugheză, olandeză. La prima pornire apare un ecran de alegere a limbii; ulterior, limba poate fi schimbată oricând dintr-un selector persistent din antet. Alegerea se reține între sesiuni.
+- **EN:** Added: full multi-language support — Romanian, English, German, French, Hungarian, Italian, Spanish, Portuguese, Dutch. A language picker appears on first run; the language can be changed anytime afterward from a persistent selector in the header. The choice is remembered between sessions.
+
 ### 1.0.18
 - Modificat: dashboard-ul e împărțit acum în două file — „Principal" (acces & siguranță, climatizare, încărcare, portbagaj) și „Avansat" (valet, plecare programată, stații de încărcare, actualizare software). Rezolvă scroll-ul excesiv pe ecrane mai mici (testat la 1366×768: de la ~600px overflow la ~20px pe fila Principal). Alegerea filei se reține între sesiuni.
 

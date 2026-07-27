@@ -92,6 +92,12 @@
   .temp-adjust { display: flex; align-items: center; justify-content: center; gap: .85rem; }
   .temp-adjust button { width: 2.1rem; height: 2.1rem; border-radius: 50%; padding: 0; }
   .temp-target { font-size: 1.05rem; font-weight: 700; min-width: 3.6rem; text-align: center; }
+  .lang-select { cursor: pointer; }
+  .lang-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+  .lang-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; max-width: 440px; width: 100%; }
+  .lang-modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; text-align: center; }
+  .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .lang-btn { width: 100%; }
 
   @media (max-width: 1500px) {
     .panels { grid-template-columns: repeat(3, 1fr); }
@@ -115,6 +121,22 @@
 </style>
 </head>
 <body>
+<div class="lang-modal-overlay" id="langModal" style="display:none">
+  <div class="lang-modal">
+    <div class="lang-modal-title" data-i18n="lang_picker_title">Alege limba</div>
+    <div class="lang-grid">
+      <button class="lang-btn" onclick="selectInitialLanguage('ro')">Română</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('en')">English</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('de')">Deutsch</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('fr')">Français</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('hu')">Magyar</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('it')">Italiano</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('es')">Español</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('pt')">Português</button>
+      <button class="lang-btn" onclick="selectInitialLanguage('nl')">Nederlands</button>
+    </div>
+  </div>
+</div>
 <div class="card">
   <div class="top-row">
     <div class="brand">
@@ -122,7 +144,18 @@
     </div>
     <div style="display:flex;align-items:center">
       <select class="vehicle-select" id="vehicleSelect" style="display:none" onchange="switchVehicle(this.value)"></select>
-      <a href="/logout" class="logout-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /><path d="M15 12h-12l3 -3" /><path d="M6 15l-3 -3" /></svg>Ieșire</a>
+      <select class="vehicle-select lang-select" id="langSelect" onchange="applyLanguage(this.value)">
+        <option value="ro">Română</option>
+        <option value="en">English</option>
+        <option value="de">Deutsch</option>
+        <option value="fr">Français</option>
+        <option value="hu">Magyar</option>
+        <option value="it">Italiano</option>
+        <option value="es">Español</option>
+        <option value="pt">Português</option>
+        <option value="nl">Nederlands</option>
+      </select>
+      <a href="/logout" class="logout-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /><path d="M15 12h-12l3 -3" /><path d="M6 15l-3 -3" /></svg><span data-i18n="logout">Ieșire</span></a>
     </div>
   </div>
   <div class="update-banner" id="updateBanner" style="display:none"></div>
@@ -132,47 +165,47 @@
     <div class="stat-card">
       <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h11a2 2 0 0 1 2 2v.5a.5 .5 0 0 0 .5 .5a.5 .5 0 0 1 .5 .5v3a.5 .5 0 0 1 -.5 .5a.5 .5 0 0 0 -.5 .5v.5a2 2 0 0 1 -2 2h-11a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2" /><path d="M7 10l0 4" /><path d="M10 10l0 4" /></svg>
       <div class="stat-value" id="statBattery">–</div>
-      <div class="stat-label">baterie</div>
+      <div class="stat-label" data-i18n="stat_battery">baterie</div>
     </div>
     <div class="stat-card">
       <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4" /><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5" /></svg>
       <div class="stat-value" id="statRange">–</div>
-      <div class="stat-label">autonomie</div>
+      <div class="stat-label" data-i18n="stat_range">autonomie</div>
     </div>
     <div class="stat-card">
       <span class="stat-icon" id="statLockIcon" style="display:inline-flex"></span>
       <div class="stat-value" id="statLock">–</div>
-      <div class="stat-label">acces</div>
+      <div class="stat-label" data-i18n="stat_access">acces</div>
     </div>
     <div class="stat-card">
       <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" /></svg>
       <div class="stat-value" id="statClimate">–</div>
-      <div class="stat-label">climatizare</div>
+      <div class="stat-label" data-i18n="stat_climate">climatizare</div>
     </div>
   </div>
 
   <div class="tpms-box">
-    <div class="tpms-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M13.41 10.59l2.59 -2.59" /><path d="M7 12a5 5 0 0 1 5 -5" /></svg>Presiune anvelope (Bar)</div>
+    <div class="tpms-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M13.41 10.59l2.59 -2.59" /><path d="M7 12a5 5 0 0 1 5 -5" /></svg><span data-i18n="tpms_title">Presiune anvelope (Bar)</span></div>
     <div class="tpms-grid">
-      <div class="tpms-cell"><span>Față stânga</span><b id="tpmsFL">–</b></div>
-      <div class="tpms-cell"><span>Față dreapta</span><b id="tpmsFR">–</b></div>
-      <div class="tpms-cell"><span>Spate stânga</span><b id="tpmsRL">–</b></div>
-      <div class="tpms-cell"><span>Spate dreapta</span><b id="tpmsRR">–</b></div>
+      <div class="tpms-cell"><span data-i18n="tpms_fl">Față stânga</span><b id="tpmsFL">–</b></div>
+      <div class="tpms-cell"><span data-i18n="tpms_fr">Față dreapta</span><b id="tpmsFR">–</b></div>
+      <div class="tpms-cell"><span data-i18n="tpms_rl">Spate stânga</span><b id="tpmsRL">–</b></div>
+      <div class="tpms-cell"><span data-i18n="tpms_rr">Spate dreapta</span><b id="tpmsRR">–</b></div>
     </div>
   </div>
 
   <div class="tabs-row">
-    <button class="tab-btn" id="tabBtnMain" onclick="showTab('main')">Principal</button>
-    <button class="tab-btn" id="tabBtnAdvanced" onclick="showTab('advanced')">Avansat</button>
+    <button class="tab-btn" id="tabBtnMain" onclick="showTab('main')" data-i18n="tab_main">Principal</button>
+    <button class="tab-btn" id="tabBtnAdvanced" onclick="showTab('advanced')" data-i18n="tab_advanced">Avansat</button>
   </div>
 
   <div class="panels" id="tabMain">
     <div class="panel panel-safety">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" /></svg>Acces & siguranță</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" /></svg><span data-i18n="panel_safety_title">Acces & siguranță</span></div>
       <div class="grid">
-        <button onclick="send('wake')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M12 10l0 3l2 0" /><path d="M7 4l-2.75 2" /><path d="M17 4l2.75 2" /></svg>Trezește mașina</button>
-        <button onclick="send('flash')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /><path d="M9.7 17l4.6 0" /></svg>Flash faruri</button>
-        <button onclick="send('honk')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a3 3 0 0 1 0 6" /><path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5" /><path d="M12 8l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8" /></svg>Claxon</button>
+        <button onclick="send('wake')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M12 10l0 3l2 0" /><path d="M7 4l-2.75 2" /><path d="M17 4l2.75 2" /></svg><span data-i18n="btn_wake">Trezește mașina</span></button>
+        <button onclick="send('flash')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /><path d="M9.7 17l4.6 0" /></svg><span data-i18n="btn_flash">Flash faruri</span></button>
+        <button onclick="send('honk')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a3 3 0 0 1 0 6" /><path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5" /><path d="M12 8l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8" /></svg><span data-i18n="btn_honk">Claxon</span></button>
         <button class="toggle-btn" id="toggleWindows" onclick="toggleFeature('windows')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3.866 0 -7 3.272 -7 7v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-10c0 -3.728 -3.134 -7 -7 -7" /><path d="M5 13l14 0" /><path d="M12 3l0 18" /></svg><span>Geamuri: –</span></button>
         <button class="toggle-btn" id="toggleSentry" onclick="toggleFeature('sentry')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" /></svg><span>Sentry: –</span></button>
         <button class="toggle-btn" id="toggleLock" onclick="toggleFeature('lock')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg><span>Blocare: –</span></button>
@@ -180,11 +213,11 @@
     </div>
 
     <div class="panel panel-climate">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" /></svg>Climatizare</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l2 1l2 -1" /><path d="M12 2v6.5l3 1.72" /><path d="M17.928 6.268l.134 2.232l1.866 1.232" /><path d="M20.66 7l-5.629 3.25l.01 3.458" /><path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /><path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /><path d="M14 20l-2 -1l-2 1" /><path d="M12 22v-6.5l-3 -1.72" /><path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /><path d="M3.34 17l5.629 -3.25l-.01 -3.458" /><path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /><path d="M3.34 7l5.629 3.25l2.99 -1.738" /></svg><span data-i18n="panel_climate_title">Climatizare</span></div>
       <div class="temp-box">
         <div class="temp-readout">
-          <span>In: <b id="tempInside">–</b></span>
-          <span>Out: <b id="tempOutside">–</b></span>
+          <span><span data-i18n="label_in">In</span>: <b id="tempInside">–</b></span>
+          <span><span data-i18n="label_out">Out</span>: <b id="tempOutside">–</b></span>
         </div>
         <div class="temp-adjust">
           <button onclick="adjustTemp(-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg></button>
@@ -198,23 +231,23 @@
         <button class="toggle-btn" id="toggleSteering" onclick="toggleFeature('steering')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M10 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg><span>Volan: –</span></button>
       </div>
       <select class="pin-input" id="seatPositionSelect" style="margin-top:.5rem">
-        <option value="1">Scaun încălzit: Pasager față</option>
-        <option value="2">Scaun încălzit: Spate stânga</option>
-        <option value="4">Scaun încălzit: Spate centru</option>
-        <option value="5">Scaun încălzit: Spate dreapta</option>
+        <option value="1" data-i18n="seat_opt_1">Scaun încălzit: Pasager față</option>
+        <option value="2" data-i18n="seat_opt_2">Scaun încălzit: Spate stânga</option>
+        <option value="4" data-i18n="seat_opt_4">Scaun încălzit: Spate centru</option>
+        <option value="5" data-i18n="seat_opt_5">Scaun încălzit: Spate dreapta</option>
       </select>
       <div class="grid">
-        <button onclick="setPassengerSeatHeater(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></svg>Pornește</button>
-        <button onclick="setPassengerSeatHeater(false)">Oprește</button>
+        <button onclick="setPassengerSeatHeater(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></svg><span data-i18n="btn_start">Pornește</span></button>
+        <button onclick="setPassengerSeatHeater(false)" data-i18n="btn_stop">Oprește</button>
       </div>
     </div>
 
     <div class="panel panel-charging">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg>Încărcare</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg><span data-i18n="panel_charging_title">Încărcare</span></div>
       <div class="temp-box">
         <div class="temp-readout">
-          <span>Limită</span>
-          <span>Stare: <b id="chargingState">–</b></span>
+          <span data-i18n="label_limit">Limită</span>
+          <span><span data-i18n="label_state">Stare</span>: <b id="chargingState">–</b></span>
         </div>
         <div class="temp-adjust">
           <button onclick="adjustChargeLimit(-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg></button>
@@ -224,7 +257,7 @@
       </div>
       <div class="temp-box">
         <div class="temp-readout">
-          <span>Curent încărcare (economie)</span>
+          <span data-i18n="label_charge_amps">Curent încărcare (economie)</span>
         </div>
         <div class="temp-adjust">
           <button onclick="adjustChargeAmps(-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg></button>
@@ -233,89 +266,637 @@
         </div>
       </div>
       <div class="grid">
-        <button onclick="send('charge_start')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg>Start</button>
-        <button onclick="send('charge_stop')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg>Stop</button>
+        <button onclick="send('charge_start')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054" /><path d="M4 20l3.5 -3.5" /><path d="M15 4l-3.5 3.5" /><path d="M20 9l-3.5 3.5" /></svg><span data-i18n="btn_charge_start">Start</span></button>
+        <button onclick="send('charge_stop')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg><span data-i18n="btn_charge_stop">Stop</span></button>
         <button class="wide toggle-btn" id="toggleChargePort" onclick="toggleFeature('chargePort')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12l5 5l-1.5 1.5a3.536 3.536 0 1 1 -5 -5l1.5 -1.5" /><path d="M17 12l-5 -5l1.5 -1.5a3.536 3.536 0 1 1 5 5l-1.5 1.5" /><path d="M3 21l2.5 -2.5" /><path d="M18.5 5.5l2.5 -2.5" /><path d="M10 11l-2 2" /><path d="M13 14l-2 2" /></svg><span>Capac priză: –</span></button>
       </div>
     </div>
 
     <div class="panel panel-trunk">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>Portbagaj</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg><span data-i18n="panel_trunk_title">Portbagaj</span></div>
       <div class="grid">
-        <button class="wide" onclick="confirmSend('trunk_rear', 'Deschizi portbagajul spate?')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>Portbagaj spate</button>
-        <button class="wide" onclick="confirmSend('trunk_front', 'Deschizi portbagajul față (frunk)?')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>Portbagaj față (frunk)</button>
+        <button class="wide" onclick="confirmSend('trunk_rear', 'confirm_trunk_rear')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg><span data-i18n="btn_trunk_rear">Portbagaj spate</span></button>
+        <button class="wide" onclick="confirmSend('trunk_front', 'confirm_trunk_front')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -10" /><path d="M9 6v-1a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1" /><path d="M6 10h12" /><path d="M6 16h12" /><path d="M9 20v1" /><path d="M15 20v1" /></svg><span data-i18n="btn_trunk_front">Portbagaj față (frunk)</span></button>
       </div>
     </div>
   </div>
 
   <div class="panels" id="tabAdvanced" style="display:none">
     <div class="panel panel-valet">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /><path d="M15 9h.01" /></svg>Valet & limitare viteză</div>
-      <input type="password" inputmode="numeric" maxlength="4" class="pin-input" id="pinInput" placeholder="PIN (4 cifre)" />
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /><path d="M15 9h.01" /></svg><span data-i18n="panel_valet_title">Valet & limitare viteză</span></div>
+      <input type="password" inputmode="numeric" maxlength="4" class="pin-input" id="pinInput" placeholder="PIN (4 cifre)" data-i18n-ph="ph_pin" />
       <div class="grid">
-        <button onclick="valetToggle(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /><path d="M15 9h.01" /></svg>Activează Valet</button>
-        <button onclick="valetToggle(false)">Dezactivează Valet</button>
+        <button onclick="valetToggle(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0" /><path d="M15 9h.01" /></svg><span data-i18n="btn_valet_on">Activează Valet</span></button>
+        <button onclick="valetToggle(false)" data-i18n="btn_valet_off">Dezactivează Valet</button>
       </div>
-      <input type="number" class="num-input" id="speedLimitInput" placeholder="Limită viteză (km/h)" style="margin-top:.5rem" />
+      <input type="number" class="num-input" id="speedLimitInput" placeholder="Limită viteză (km/h)" data-i18n-ph="ph_speed_limit" style="margin-top:.5rem" />
       <div class="grid">
-        <button onclick="speedLimitToggle(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.446 2.6l7.955 7.954a2.045 2.045 0 0 1 0 2.892l-7.955 7.955a2.045 2.045 0 0 1 -2.892 0l-7.955 -7.955a2.045 2.045 0 0 1 0 -2.892l7.955 -7.955a2.045 2.045 0 0 1 2.892 0" /><path d="M9 14v-2c0 -.59 .414 -1 1 -1h5" /><path d="M13 9l2 2l-2 2" /></svg>Activează limită</button>
-        <button onclick="speedLimitToggle(false)">Dezactivează limită</button>
-        <button class="wide" onclick="speedLimitSet()">Setează limita</button>
+        <button onclick="speedLimitToggle(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.446 2.6l7.955 7.954a2.045 2.045 0 0 1 0 2.892l-7.955 7.955a2.045 2.045 0 0 1 -2.892 0l-7.955 -7.955a2.045 2.045 0 0 1 0 -2.892l7.955 -7.955a2.045 2.045 0 0 1 2.892 0" /><path d="M9 14v-2c0 -.59 .414 -1 1 -1h5" /><path d="M13 9l2 2l-2 2" /></svg><span data-i18n="btn_speedlimit_on">Activează limită</span></button>
+        <button onclick="speedLimitToggle(false)" data-i18n="btn_speedlimit_off">Dezactivează limită</button>
+        <button class="wide" onclick="speedLimitSet()" data-i18n="btn_speedlimit_set">Setează limita</button>
       </div>
     </div>
 
     <div class="panel panel-schedule">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>Plecare programată</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg><span data-i18n="panel_schedule_title">Plecare programată</span></div>
       <input type="time" class="time-input" id="departureTime" />
-      <div class="field-row"><label for="preconditionToggle">Preîncălzire cabină la plecare</label><input type="checkbox" id="preconditionToggle" /></div>
-      <div class="field-row"><label for="offPeakToggle">Încărcare cu tarif redus (off-peak)</label><input type="checkbox" id="offPeakToggle" /></div>
-      <input type="time" class="time-input" id="offPeakEndTime" title="Ora la care se termină tariful redus" />
+      <div class="field-row"><label for="preconditionToggle" data-i18n="label_precondition">Preîncălzire cabină la plecare</label><input type="checkbox" id="preconditionToggle" /></div>
+      <div class="field-row"><label for="offPeakToggle" data-i18n="label_offpeak">Încărcare cu tarif redus (off-peak)</label><input type="checkbox" id="offPeakToggle" /></div>
+      <input type="time" class="time-input" id="offPeakEndTime" title="Ora la care se termină tariful redus" data-i18n-title="title_offpeak_end" />
       <div class="grid">
-        <button class="wide" onclick="saveScheduleDeparture()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>Salvează programarea</button>
-        <button class="wide" onclick="cancelScheduleDeparture()">Anulează programarea</button>
+        <button class="wide" onclick="saveScheduleDeparture()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg><span data-i18n="btn_save_schedule">Salvează programarea</span></button>
+        <button class="wide" onclick="cancelScheduleDeparture()" data-i18n="btn_cancel_schedule">Anulează programarea</button>
       </div>
     </div>
 
     <div class="panel panel-update">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Actualizare software</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg><span data-i18n="panel_update_title">Actualizare software</span></div>
       <div class="temp-readout" style="margin-bottom:.5rem">
-        <span>Versiune: <b id="firmwareVersion">–</b></span>
-        <span>Stare: <b id="updateStatus">–</b></span>
+        <span><span data-i18n="label_version">Versiune</span>: <b id="firmwareVersion">–</b></span>
+        <span><span data-i18n="label_state">Stare</span>: <b id="updateStatus">–</b></span>
       </div>
       <div class="grid">
-        <button class="wide" onclick="checkSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>Verifică actualizare</button>
-        <button onclick="scheduleSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>Instalează acum</button>
-        <button onclick="cancelSoftwareUpdate()">Anulează instalarea</button>
+        <button class="wide" onclick="checkSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg><span data-i18n="btn_check_update">Verifică actualizare</span></button>
+        <button onclick="scheduleSoftwareUpdate()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg><span data-i18n="btn_install_update">Instalează acum</span></button>
+        <button onclick="cancelSoftwareUpdate()" data-i18n="btn_cancel_update">Anulează instalarea</button>
       </div>
     </div>
 
     <div class="panel wide-panel panel-nearby">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Stații de încărcare din apropiere</div>
-      <button class="wide" onclick="loadNearbyCharging()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg>Caută stații</button>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg><span data-i18n="panel_nearby_title">Stații de încărcare din apropiere</span></div>
+      <button class="wide" onclick="loadNearbyCharging()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /><path d="M19 16l-2 3h4l-2 3" /></svg><span data-i18n="btn_search_stations">Caută stații</span></button>
       <div id="nearbyChargingList" style="margin-top:.5rem"></div>
     </div>
 
     <div class="panel wide-panel" id="batteryHistoryPanel" style="display:none">
-      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6l4 -4l8 8" /><path d="M21 10l0 7l-7 0" /></svg>Autonomie la 100% (istoric)</div>
+      <div class="panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6l4 -4l8 8" /><path d="M21 10l0 7l-7 0" /></svg><span data-i18n="panel_history_title">Autonomie la 100% (istoric)</span></div>
       <div id="batteryHistoryChart"></div>
     </div>
   </div>
 
-  <button class="refresh-btn" onclick="refreshStatus()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>Actualizează status</button>
+  <button class="refresh-btn" onclick="refreshStatus()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg><span data-i18n="btn_refresh">Actualizează status</span></button>
   <div class="auto-refresh-row">
-    <label for="autoRefresh">Auto-actualizare:</label>
+    <label for="autoRefresh" data-i18n="label_autorefresh">Auto-actualizare:</label>
     <select id="autoRefresh" onchange="setAutoRefresh(this.value)">
-      <option value="0">Oprit</option>
-      <option value="30">30 secunde</option>
-      <option value="60">1 minut</option>
-      <option value="180">3 minute</option>
-      <option value="300">5 minute</option>
-      <option value="600">10 minute</option>
+      <option value="0" data-i18n="opt_off">Oprit</option>
+      <option value="30" data-i18n="opt_30s">30 secunde</option>
+      <option value="60" data-i18n="opt_1m">1 minut</option>
+      <option value="180" data-i18n="opt_3m">3 minute</option>
+      <option value="300" data-i18n="opt_5m">5 minute</option>
+      <option value="600" data-i18n="opt_10m">10 minute</option>
     </select>
   </div>
-  <a class="donate-link" href="https://revolut.me/andreiedward" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>Donează pentru a susține proiectul</a>
+  <a class="donate-link" href="https://revolut.me/andreiedward" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg><span data-i18n="btn_donate">Donează pentru a susține proiectul</span></a>
 </div>
 <script>
+const TRANSLATIONS = {
+  ro: {
+    logout: 'Ieșire', status_loading: 'Se încarcă...',
+    stat_battery: 'baterie', stat_range: 'autonomie', stat_access: 'acces', stat_climate: 'climatizare',
+    tpms_title: 'Presiune anvelope (Bar)', tpms_fl: 'Față stânga', tpms_fr: 'Față dreapta', tpms_rl: 'Spate stânga', tpms_rr: 'Spate dreapta',
+    tab_main: 'Principal', tab_advanced: 'Avansat',
+    panel_safety_title: 'Acces & siguranță', panel_climate_title: 'Climatizare', panel_charging_title: 'Încărcare', panel_trunk_title: 'Portbagaj',
+    panel_valet_title: 'Valet & limitare viteză', panel_schedule_title: 'Plecare programată', panel_update_title: 'Actualizare software',
+    panel_nearby_title: 'Stații de încărcare din apropiere', panel_history_title: 'Autonomie la 100% (istoric)',
+    btn_wake: 'Trezește mașina', btn_flash: 'Flash faruri', btn_honk: 'Claxon',
+    toggle_windows_label: 'Geamuri', state_windows_closed: 'Închise', state_windows_open: 'Deschise',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Blocare', state_lock_locked: 'Blocată', state_lock_unlocked: 'Deblocată',
+    label_in: 'In', label_out: 'Out', toggle_climate_label: 'Climatizare', toggle_seat_label: 'Scaun', toggle_steering_label: 'Volan',
+    seat_opt_1: 'Scaun încălzit: Pasager față', seat_opt_2: 'Scaun încălzit: Spate stânga', seat_opt_4: 'Scaun încălzit: Spate centru', seat_opt_5: 'Scaun încălzit: Spate dreapta',
+    btn_start: 'Pornește', btn_stop: 'Oprește',
+    label_limit: 'Limită', label_state: 'Stare', label_charge_amps: 'Curent încărcare (economie)', btn_charge_start: 'Start', btn_charge_stop: 'Stop',
+    toggle_chargeport_label: 'Capac priză', state_port_open: 'Deschis', state_port_closed: 'Închis',
+    btn_trunk_rear: 'Portbagaj spate', confirm_trunk_rear: 'Deschizi portbagajul spate?',
+    btn_trunk_front: 'Portbagaj față (frunk)', confirm_trunk_front: 'Deschizi portbagajul față (frunk)?',
+    ph_pin: 'PIN (4 cifre)', btn_valet_on: 'Activează Valet', btn_valet_off: 'Dezactivează Valet',
+    ph_speed_limit: 'Limită viteză (km/h)', btn_speedlimit_on: 'Activează limită', btn_speedlimit_off: 'Dezactivează limită', btn_speedlimit_set: 'Setează limita',
+    label_precondition: 'Preîncălzire cabină la plecare', label_offpeak: 'Încărcare cu tarif redus (off-peak)', title_offpeak_end: 'Ora la care se termină tariful redus',
+    btn_save_schedule: 'Salvează programarea', btn_cancel_schedule: 'Anulează programarea',
+    label_version: 'Versiune', btn_check_update: 'Verifică actualizare', btn_install_update: 'Instalează acum', btn_cancel_update: 'Anulează instalarea',
+    btn_search_stations: 'Caută stații', msg_searching: 'Se caută...', msg_no_stations: 'Nicio stație găsită în apropiere.', msg_network_error_dot: 'Eroare de rețea.',
+    label_stalls_free: 'libere', btn_navigate: 'Navighează', btn_view_map: 'Vezi pe hartă', msg_unknown_error: 'Eroare necunoscută',
+    msg_history_note: 'Se înregistrează automat data viitoare când mașina ajunge la 100% încărcare. Sunt necesare cel puțin 2 puncte pentru a arăta un trend.',
+    btn_refresh: 'Actualizează status', label_autorefresh: 'Auto-actualizare:',
+    opt_off: 'Oprit', opt_30s: '30 secunde', opt_1m: '1 minut', opt_3m: '3 minute', opt_5m: '5 minute', opt_10m: '10 minute',
+    btn_donate: 'Donează pentru a susține proiectul',
+    label_lock: 'Blocare', label_unlock: 'Deblocare', label_climate_on: 'Climatizare ON', label_climate_off: 'Climatizare OFF',
+    label_wake: 'Trezire mașină', label_vent_windows: 'Deschidere geamuri', label_close_windows: 'Închidere geamuri',
+    label_charge_start: 'Start încărcare', label_charge_stop: 'Stop încărcare', label_charge_port_open: 'Deschidere capac priză', label_charge_port_close: 'Închidere capac priză',
+    label_sentry_on: 'Sentry Mode ON', label_sentry_off: 'Sentry Mode OFF',
+    label_seat_heater_on: 'Scaun încălzit ON', label_seat_heater_off: 'Scaun încălzit OFF',
+    label_steering_heater_on: 'Volan încălzit ON', label_steering_heater_off: 'Volan încălzit OFF',
+    label_valet_on: 'Valet Mode ON', label_valet_off: 'Valet Mode OFF',
+    label_speed_limit_on: 'Limită viteză ON', label_speed_limit_off: 'Limită viteză OFF', label_speed_limit_set: 'Setare limită viteză',
+    label_navigate_to: 'Navigare', label_seat_heater_set: 'Scaun încălzit',
+    label_software_update_schedule: 'Programare update', label_software_update_cancel: 'Anulare update',
+    label_temperature: 'Temperatură', label_charge_limit: 'Limită încărcare', label_charge_current: 'Curent încărcare',
+    msg_sending: 'Trimit', msg_success_suffix: '— reușit', msg_unknown_reason: 'motiv necunoscut', msg_network_error_prefix: 'Eroare de rețea',
+    msg_virtual_key_error: '{label}: cheia virtuală nu e asociată cu mașina. Pe telefon, cu aplicația Tesla deschisă și lângă mașină, accesează {url} și apasă „Add Key”.',
+    msg_wake_sent: 'Trezire trimisă', msg_state_suffix: '(stare: {state})',
+    msg_updating: 'Se actualizează...', msg_updated: 'Actualizat.', msg_no_update: 'Fără update disponibil',
+    msg_new_version: 'A apărut o versiune nouă ({version}).', btn_download: 'Descarcă',
+    msg_adjusting_temp: 'Reglez temperatura...', msg_set_to: 'Setat la {value}',
+    msg_adjusting_charge_limit: 'Reglez limita de încărcare...', msg_limit_set_to: 'Limită setată la {value}',
+    msg_adjusting_charge_amps: 'Reglez curentul de încărcare...', msg_amps_set_to: 'Curent setat la {value}',
+    msg_invalid_pin: 'Introdu un PIN de 4 cifre.', msg_invalid_speed_limit: 'Introdu o limită de viteză validă.', msg_choose_departure_time: 'Alege o oră de plecare.',
+    msg_checking_update: 'Verific actualizări...', msg_update_available: 'Actualizare disponibilă: {status}', msg_no_update_now: 'Nicio actualizare disponibilă momentan.',
+    msg_vehicle_offline: 'vehiculul nu este disponibil: este offline sau adormit',
+    state_on: 'Pornit', state_off: 'Oprit', lang_picker_title: 'Alege limba',
+  },
+  en: {
+    logout: 'Sign out', status_loading: 'Loading...',
+    stat_battery: 'battery', stat_range: 'range', stat_access: 'access', stat_climate: 'climate',
+    tpms_title: 'Tire pressure (Bar)', tpms_fl: 'Front left', tpms_fr: 'Front right', tpms_rl: 'Rear left', tpms_rr: 'Rear right',
+    tab_main: 'Main', tab_advanced: 'Advanced',
+    panel_safety_title: 'Access & security', panel_climate_title: 'Climate', panel_charging_title: 'Charging', panel_trunk_title: 'Trunk',
+    panel_valet_title: 'Valet & speed limit', panel_schedule_title: 'Scheduled departure', panel_update_title: 'Software update',
+    panel_nearby_title: 'Nearby charging stations', panel_history_title: 'Range at 100% (history)',
+    btn_wake: 'Wake vehicle', btn_flash: 'Flash lights', btn_honk: 'Honk horn',
+    toggle_windows_label: 'Windows', state_windows_closed: 'Closed', state_windows_open: 'Open',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Lock', state_lock_locked: 'Locked', state_lock_unlocked: 'Unlocked',
+    label_in: 'In', label_out: 'Out', toggle_climate_label: 'Climate', toggle_seat_label: 'Seat', toggle_steering_label: 'Steering wheel',
+    seat_opt_1: 'Seat heater: Front passenger', seat_opt_2: 'Seat heater: Rear left', seat_opt_4: 'Seat heater: Rear center', seat_opt_5: 'Seat heater: Rear right',
+    btn_start: 'Turn on', btn_stop: 'Turn off',
+    label_limit: 'Limit', label_state: 'Status', label_charge_amps: 'Charge current (economy)', btn_charge_start: 'Start', btn_charge_stop: 'Stop',
+    toggle_chargeport_label: 'Charge port', state_port_open: 'Open', state_port_closed: 'Closed',
+    btn_trunk_rear: 'Rear trunk', confirm_trunk_rear: 'Open the rear trunk?',
+    btn_trunk_front: 'Front trunk (frunk)', confirm_trunk_front: 'Open the front trunk (frunk)?',
+    ph_pin: 'PIN (4 digits)', btn_valet_on: 'Enable Valet', btn_valet_off: 'Disable Valet',
+    ph_speed_limit: 'Speed limit (km/h)', btn_speedlimit_on: 'Enable limit', btn_speedlimit_off: 'Disable limit', btn_speedlimit_set: 'Set limit',
+    label_precondition: 'Precondition cabin before departure', label_offpeak: 'Off-peak charging', title_offpeak_end: 'Time when the off-peak rate ends',
+    btn_save_schedule: 'Save schedule', btn_cancel_schedule: 'Cancel schedule',
+    label_version: 'Version', btn_check_update: 'Check for update', btn_install_update: 'Install now', btn_cancel_update: 'Cancel installation',
+    btn_search_stations: 'Search stations', msg_searching: 'Searching...', msg_no_stations: 'No stations found nearby.', msg_network_error_dot: 'Network error.',
+    label_stalls_free: 'free', btn_navigate: 'Navigate', btn_view_map: 'View on map', msg_unknown_error: 'Unknown error',
+    msg_history_note: 'This is recorded automatically next time the car reaches 100% charge. At least 2 data points are needed to show a trend.',
+    btn_refresh: 'Refresh status', label_autorefresh: 'Auto-refresh:',
+    opt_off: 'Off', opt_30s: '30 seconds', opt_1m: '1 minute', opt_3m: '3 minutes', opt_5m: '5 minutes', opt_10m: '10 minutes',
+    btn_donate: 'Donate to support the project',
+    label_lock: 'Lock', label_unlock: 'Unlock', label_climate_on: 'Climate ON', label_climate_off: 'Climate OFF',
+    label_wake: 'Wake vehicle', label_vent_windows: 'Vent windows', label_close_windows: 'Close windows',
+    label_charge_start: 'Start charging', label_charge_stop: 'Stop charging', label_charge_port_open: 'Open charge port', label_charge_port_close: 'Close charge port',
+    label_sentry_on: 'Sentry Mode ON', label_sentry_off: 'Sentry Mode OFF',
+    label_seat_heater_on: 'Seat heater ON', label_seat_heater_off: 'Seat heater OFF',
+    label_steering_heater_on: 'Steering wheel heater ON', label_steering_heater_off: 'Steering wheel heater OFF',
+    label_valet_on: 'Valet Mode ON', label_valet_off: 'Valet Mode OFF',
+    label_speed_limit_on: 'Speed limit ON', label_speed_limit_off: 'Speed limit OFF', label_speed_limit_set: 'Set speed limit',
+    label_navigate_to: 'Navigate', label_seat_heater_set: 'Seat heater',
+    label_software_update_schedule: 'Schedule update', label_software_update_cancel: 'Cancel update',
+    label_temperature: 'Temperature', label_charge_limit: 'Charge limit', label_charge_current: 'Charge current',
+    msg_sending: 'Sending', msg_success_suffix: '— success', msg_unknown_reason: 'unknown reason', msg_network_error_prefix: 'Network error',
+    msg_virtual_key_error: '{label}: the virtual key is not paired with the vehicle. On your phone, with the Tesla app open and near the car, open {url} and tap "Add Key".',
+    msg_wake_sent: 'Wake sent', msg_state_suffix: '(state: {state})',
+    msg_updating: 'Refreshing...', msg_updated: 'Updated.', msg_no_update: 'No update available',
+    msg_new_version: 'A new version is available ({version}).', btn_download: 'Download',
+    msg_adjusting_temp: 'Adjusting temperature...', msg_set_to: 'Set to {value}',
+    msg_adjusting_charge_limit: 'Adjusting charge limit...', msg_limit_set_to: 'Limit set to {value}',
+    msg_adjusting_charge_amps: 'Adjusting charge current...', msg_amps_set_to: 'Current set to {value}',
+    msg_invalid_pin: 'Enter a 4-digit PIN.', msg_invalid_speed_limit: 'Enter a valid speed limit.', msg_choose_departure_time: 'Choose a departure time.',
+    msg_checking_update: 'Checking for updates...', msg_update_available: 'Update available: {status}', msg_no_update_now: 'No update available at the moment.',
+    msg_vehicle_offline: 'vehicle unavailable: the vehicle is offline or asleep',
+    state_on: 'On', state_off: 'Off', lang_picker_title: 'Choose your language',
+  },
+  de: {
+    logout: 'Abmelden', status_loading: 'Wird geladen...',
+    stat_battery: 'Batterie', stat_range: 'Reichweite', stat_access: 'Zugang', stat_climate: 'Klima',
+    tpms_title: 'Reifendruck (Bar)', tpms_fl: 'Vorne links', tpms_fr: 'Vorne rechts', tpms_rl: 'Hinten links', tpms_rr: 'Hinten rechts',
+    tab_main: 'Hauptmenü', tab_advanced: 'Erweitert',
+    panel_safety_title: 'Zugang & Sicherheit', panel_climate_title: 'Klima', panel_charging_title: 'Laden', panel_trunk_title: 'Kofferraum',
+    panel_valet_title: 'Valet-Modus & Geschwindigkeitsbegrenzung', panel_schedule_title: 'Geplante Abfahrt', panel_update_title: 'Software-Update',
+    panel_nearby_title: 'Ladestationen in der Nähe', panel_history_title: 'Reichweite bei 100% (Verlauf)',
+    btn_wake: 'Fahrzeug aufwecken', btn_flash: 'Lichthupe', btn_honk: 'Hupen',
+    toggle_windows_label: 'Fenster', state_windows_closed: 'Geschlossen', state_windows_open: 'Geöffnet',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Verriegelung', state_lock_locked: 'Verriegelt', state_lock_unlocked: 'Entriegelt',
+    label_in: 'Innen', label_out: 'Außen', toggle_climate_label: 'Klima', toggle_seat_label: 'Sitz', toggle_steering_label: 'Lenkrad',
+    seat_opt_1: 'Sitzheizung: Beifahrer vorne', seat_opt_2: 'Sitzheizung: Hinten links', seat_opt_4: 'Sitzheizung: Hinten Mitte', seat_opt_5: 'Sitzheizung: Hinten rechts',
+    btn_start: 'Einschalten', btn_stop: 'Ausschalten',
+    label_limit: 'Limit', label_state: 'Status', label_charge_amps: 'Ladestrom (Sparmodus)', btn_charge_start: 'Start', btn_charge_stop: 'Stopp',
+    toggle_chargeport_label: 'Ladeklappe', state_port_open: 'Geöffnet', state_port_closed: 'Geschlossen',
+    btn_trunk_rear: 'Kofferraum hinten', confirm_trunk_rear: 'Kofferraum hinten öffnen?',
+    btn_trunk_front: 'Frunk (Kofferraum vorne)', confirm_trunk_front: 'Frunk öffnen?',
+    ph_pin: 'PIN (4 Ziffern)', btn_valet_on: 'Valet-Modus aktivieren', btn_valet_off: 'Valet-Modus deaktivieren',
+    ph_speed_limit: 'Geschwindigkeitsbegrenzung (km/h)', btn_speedlimit_on: 'Limit aktivieren', btn_speedlimit_off: 'Limit deaktivieren', btn_speedlimit_set: 'Limit festlegen',
+    label_precondition: 'Innenraum vor Abfahrt vorklimatisieren', label_offpeak: 'Laden zum Niedertarif (Schwachlast)', title_offpeak_end: 'Uhrzeit, zu der der Niedertarif endet',
+    btn_save_schedule: 'Zeitplan speichern', btn_cancel_schedule: 'Zeitplan abbrechen',
+    label_version: 'Version', btn_check_update: 'Nach Update suchen', btn_install_update: 'Jetzt installieren', btn_cancel_update: 'Installation abbrechen',
+    btn_search_stations: 'Stationen suchen', msg_searching: 'Suche läuft...', msg_no_stations: 'Keine Stationen in der Nähe gefunden.', msg_network_error_dot: 'Netzwerkfehler.',
+    label_stalls_free: 'frei', btn_navigate: 'Navigieren', btn_view_map: 'Auf Karte ansehen', msg_unknown_error: 'Unbekannter Fehler',
+    msg_history_note: 'Dies wird automatisch erfasst, sobald das Fahrzeug das nächste Mal 100% Ladung erreicht. Es sind mindestens 2 Datenpunkte nötig, um einen Trend anzuzeigen.',
+    btn_refresh: 'Status aktualisieren', label_autorefresh: 'Automatische Aktualisierung:',
+    opt_off: 'Aus', opt_30s: '30 Sekunden', opt_1m: '1 Minute', opt_3m: '3 Minuten', opt_5m: '5 Minuten', opt_10m: '10 Minuten',
+    btn_donate: 'Spenden, um das Projekt zu unterstützen',
+    label_lock: 'Verriegelung', label_unlock: 'Entriegelung', label_climate_on: 'Klima EIN', label_climate_off: 'Klima AUS',
+    label_wake: 'Fahrzeug aufwecken', label_vent_windows: 'Fenster öffnen', label_close_windows: 'Fenster schließen',
+    label_charge_start: 'Laden starten', label_charge_stop: 'Laden stoppen', label_charge_port_open: 'Ladeklappe öffnen', label_charge_port_close: 'Ladeklappe schließen',
+    label_sentry_on: 'Sentry-Modus EIN', label_sentry_off: 'Sentry-Modus AUS',
+    label_seat_heater_on: 'Sitzheizung EIN', label_seat_heater_off: 'Sitzheizung AUS',
+    label_steering_heater_on: 'Lenkradheizung EIN', label_steering_heater_off: 'Lenkradheizung AUS',
+    label_valet_on: 'Valet-Modus EIN', label_valet_off: 'Valet-Modus AUS',
+    label_speed_limit_on: 'Geschwindigkeitsbegrenzung EIN', label_speed_limit_off: 'Geschwindigkeitsbegrenzung AUS', label_speed_limit_set: 'Geschwindigkeitsbegrenzung festlegen',
+    label_navigate_to: 'Navigation', label_seat_heater_set: 'Sitzheizung',
+    label_software_update_schedule: 'Update planen', label_software_update_cancel: 'Update abbrechen',
+    label_temperature: 'Temperatur', label_charge_limit: 'Ladelimit', label_charge_current: 'Ladestrom',
+    msg_sending: 'Sende', msg_success_suffix: '— erfolgreich', msg_unknown_reason: 'unbekannter Grund', msg_network_error_prefix: 'Netzwerkfehler',
+    msg_virtual_key_error: '{label}: Der virtuelle Schlüssel ist nicht mit dem Fahrzeug gekoppelt. Öffne auf deinem Telefon in der Nähe des Fahrzeugs die Tesla-App, rufe {url} auf und tippe auf „Add Key".',
+    msg_wake_sent: 'Aufwecken gesendet', msg_state_suffix: '(Status: {state})',
+    msg_updating: 'Wird aktualisiert...', msg_updated: 'Aktualisiert.', msg_no_update: 'Kein Update verfügbar',
+    msg_new_version: 'Eine neue Version ist verfügbar ({version}).', btn_download: 'Herunterladen',
+    msg_adjusting_temp: 'Temperatur wird angepasst...', msg_set_to: 'Auf {value} eingestellt',
+    msg_adjusting_charge_limit: 'Ladelimit wird angepasst...', msg_limit_set_to: 'Limit auf {value} eingestellt',
+    msg_adjusting_charge_amps: 'Ladestrom wird angepasst...', msg_amps_set_to: 'Strom auf {value} eingestellt',
+    msg_invalid_pin: 'Gib eine 4-stellige PIN ein.', msg_invalid_speed_limit: 'Gib eine gültige Geschwindigkeitsbegrenzung ein.', msg_choose_departure_time: 'Wähle eine Abfahrtszeit.',
+    msg_checking_update: 'Suche nach Updates...', msg_update_available: 'Update verfügbar: {status}', msg_no_update_now: 'Derzeit ist kein Update verfügbar.',
+    msg_vehicle_offline: 'Fahrzeug nicht verfügbar: Fahrzeug ist offline oder im Ruhemodus',
+    state_on: 'Ein', state_off: 'Aus', lang_picker_title: 'Sprache wählen',
+  },
+  fr: {
+    logout: 'Déconnexion', status_loading: 'Chargement...',
+    stat_battery: 'batterie', stat_range: 'autonomie', stat_access: 'accès', stat_climate: 'climatisation',
+    tpms_title: 'Pression des pneus (Bar)', tpms_fl: 'Avant gauche', tpms_fr: 'Avant droit', tpms_rl: 'Arrière gauche', tpms_rr: 'Arrière droit',
+    tab_main: 'Principal', tab_advanced: 'Avancé',
+    panel_safety_title: 'Accès & sécurité', panel_climate_title: 'Climatisation', panel_charging_title: 'Charge', panel_trunk_title: 'Coffre',
+    panel_valet_title: 'Mode voiturier et limite de vitesse', panel_schedule_title: 'Départ programmé', panel_update_title: 'Mise à jour logicielle',
+    panel_nearby_title: 'Bornes de recharge à proximité', panel_history_title: 'Autonomie à 100 % (historique)',
+    btn_wake: 'Réveiller le véhicule', btn_flash: 'Clignoter les phares', btn_honk: 'Klaxonner',
+    toggle_windows_label: 'Vitres', state_windows_closed: 'Fermées', state_windows_open: 'Ouvertes',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Verrouillage', state_lock_locked: 'Verrouillée', state_lock_unlocked: 'Déverrouillée',
+    label_in: 'Intérieur', label_out: 'Extérieur', toggle_climate_label: 'Climatisation', toggle_seat_label: 'Siège', toggle_steering_label: 'Volant',
+    seat_opt_1: 'Siège chauffant : Passager avant', seat_opt_2: 'Siège chauffant : Arrière gauche', seat_opt_4: 'Siège chauffant : Arrière centre', seat_opt_5: 'Siège chauffant : Arrière droit',
+    btn_start: 'Activer', btn_stop: 'Désactiver',
+    label_limit: 'Limite', label_state: 'État', label_charge_amps: 'Courant de charge (économie)', btn_charge_start: 'Démarrer', btn_charge_stop: 'Arrêter',
+    toggle_chargeport_label: 'Trappe de charge', state_port_open: 'Ouverte', state_port_closed: 'Fermée',
+    btn_trunk_rear: 'Coffre arrière', confirm_trunk_rear: 'Ouvrir le coffre arrière ?',
+    btn_trunk_front: 'Coffre avant (frunk)', confirm_trunk_front: 'Ouvrir le coffre avant (frunk) ?',
+    ph_pin: 'Code PIN (4 chiffres)', btn_valet_on: 'Activer le mode voiturier', btn_valet_off: 'Désactiver le mode voiturier',
+    ph_speed_limit: 'Limite de vitesse (km/h)', btn_speedlimit_on: 'Activer la limite', btn_speedlimit_off: 'Désactiver la limite', btn_speedlimit_set: 'Définir la limite',
+    label_precondition: 'Préconditionner l\'habitacle avant le départ', label_offpeak: 'Charge en heures creuses', title_offpeak_end: 'Heure de fin du tarif réduit',
+    btn_save_schedule: 'Enregistrer la programmation', btn_cancel_schedule: 'Annuler la programmation',
+    label_version: 'Version', btn_check_update: 'Vérifier la mise à jour', btn_install_update: 'Installer maintenant', btn_cancel_update: 'Annuler l\'installation',
+    btn_search_stations: 'Rechercher des bornes', msg_searching: 'Recherche...', msg_no_stations: 'Aucune borne trouvée à proximité.', msg_network_error_dot: 'Erreur réseau.',
+    label_stalls_free: 'libres', btn_navigate: 'Naviguer', btn_view_map: 'Voir sur la carte', msg_unknown_error: 'Erreur inconnue',
+    msg_history_note: 'Ceci est enregistré automatiquement la prochaine fois que la voiture atteint 100 % de charge. Au moins 2 points de données sont nécessaires pour afficher une tendance.',
+    btn_refresh: 'Actualiser le statut', label_autorefresh: 'Actualisation automatique:',
+    opt_off: 'Désactivé', opt_30s: '30 secondes', opt_1m: '1 minute', opt_3m: '3 minutes', opt_5m: '5 minutes', opt_10m: '10 minutes',
+    btn_donate: 'Faire un don pour soutenir le projet',
+    label_lock: 'Verrouillage', label_unlock: 'Déverrouillage', label_climate_on: 'Climatisation activée', label_climate_off: 'Climatisation désactivée',
+    label_wake: 'Réveil du véhicule', label_vent_windows: 'Entrouvrir les vitres', label_close_windows: 'Fermer les vitres',
+    label_charge_start: 'Démarrer la charge', label_charge_stop: 'Arrêter la charge', label_charge_port_open: 'Ouvrir la trappe de charge', label_charge_port_close: 'Fermer la trappe de charge',
+    label_sentry_on: 'Mode Sentinelle activé', label_sentry_off: 'Mode Sentinelle désactivé',
+    label_seat_heater_on: 'Siège chauffant activé', label_seat_heater_off: 'Siège chauffant désactivé',
+    label_steering_heater_on: 'Volant chauffant activé', label_steering_heater_off: 'Volant chauffant désactivé',
+    label_valet_on: 'Mode voiturier activé', label_valet_off: 'Mode voiturier désactivé',
+    label_speed_limit_on: 'Limite de vitesse activée', label_speed_limit_off: 'Limite de vitesse désactivée', label_speed_limit_set: 'Définir la limite de vitesse',
+    label_navigate_to: 'Navigation', label_seat_heater_set: 'Siège chauffant',
+    label_software_update_schedule: 'Programmer la mise à jour', label_software_update_cancel: 'Annuler la mise à jour',
+    label_temperature: 'Température', label_charge_limit: 'Limite de charge', label_charge_current: 'Courant de charge',
+    msg_sending: 'Envoi', msg_success_suffix: '— réussi', msg_unknown_reason: 'raison inconnue', msg_network_error_prefix: 'Erreur réseau',
+    msg_virtual_key_error: '{label} : la clé virtuelle n\'est pas associée au véhicule. Sur votre téléphone, avec l\'application Tesla ouverte et à proximité de la voiture, accédez à {url} et appuyez sur « Add Key ».',
+    msg_wake_sent: 'Réveil envoyé', msg_state_suffix: '(état : {state})',
+    msg_updating: 'Actualisation...', msg_updated: 'Actualisé.', msg_no_update: 'Aucune mise à jour disponible',
+    msg_new_version: 'Une nouvelle version est disponible ({version}).', btn_download: 'Télécharger',
+    msg_adjusting_temp: 'Réglage de la température...', msg_set_to: 'Réglé sur {value}',
+    msg_adjusting_charge_limit: 'Réglage de la limite de charge...', msg_limit_set_to: 'Limite réglée sur {value}',
+    msg_adjusting_charge_amps: 'Réglage du courant de charge...', msg_amps_set_to: 'Courant réglé sur {value}',
+    msg_invalid_pin: 'Saisissez un code PIN à 4 chiffres.', msg_invalid_speed_limit: 'Saisissez une limite de vitesse valide.', msg_choose_departure_time: 'Choisissez une heure de départ.',
+    msg_checking_update: 'Vérification des mises à jour...', msg_update_available: 'Mise à jour disponible : {status}', msg_no_update_now: 'Aucune mise à jour disponible pour le moment.',
+    msg_vehicle_offline: 'véhicule indisponible : le véhicule est hors ligne ou en veille',
+    state_on: 'Activé', state_off: 'Désactivé', lang_picker_title: 'Choisissez votre langue',
+  },
+  hu: {
+    logout: 'Kijelentkezés', status_loading: 'Betöltés...',
+    stat_battery: 'akkumulátor', stat_range: 'hatótávolság', stat_access: 'hozzáférés', stat_climate: 'klíma',
+    tpms_title: 'Gumiabroncs-nyomás (Bar)', tpms_fl: 'Elülső bal', tpms_fr: 'Elülső jobb', tpms_rl: 'Hátsó bal', tpms_rr: 'Hátsó jobb',
+    tab_main: 'Fő', tab_advanced: 'Speciális',
+    panel_safety_title: 'Hozzáférés és biztonság', panel_climate_title: 'Klíma', panel_charging_title: 'Töltés', panel_trunk_title: 'Csomagtartó',
+    panel_valet_title: 'Valet mód és sebességkorlátozás', panel_schedule_title: 'Ütemezett indulás', panel_update_title: 'Szoftverfrissítés',
+    panel_nearby_title: 'Közeli töltőállomások', panel_history_title: 'Hatótávolság 100%-nál (előzmények)',
+    btn_wake: 'Jármű felébresztése', btn_flash: 'Fényszóró villogtatása', btn_honk: 'Kürt',
+    toggle_windows_label: 'Ablakok', state_windows_closed: 'Zárva', state_windows_open: 'Nyitva',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Zárolás', state_lock_locked: 'Zárva', state_lock_unlocked: 'Kinyitva',
+    label_in: 'Bent', label_out: 'Kint', toggle_climate_label: 'Klíma', toggle_seat_label: 'Ülés', toggle_steering_label: 'Kormánykerék',
+    seat_opt_1: 'Ülésfűtés: Első utas', seat_opt_2: 'Ülésfűtés: Hátsó bal', seat_opt_4: 'Ülésfűtés: Hátsó közép', seat_opt_5: 'Ülésfűtés: Hátsó jobb',
+    btn_start: 'Bekapcsolás', btn_stop: 'Kikapcsolás',
+    label_limit: 'Limit', label_state: 'Állapot', label_charge_amps: 'Töltőáram (gazdaságos)', btn_charge_start: 'Indítás', btn_charge_stop: 'Leállítás',
+    toggle_chargeport_label: 'Töltőnyílás fedele', state_port_open: 'Nyitva', state_port_closed: 'Zárva',
+    btn_trunk_rear: 'Hátsó csomagtartó', confirm_trunk_rear: 'Megnyitod a hátsó csomagtartót?',
+    btn_trunk_front: 'Elülső csomagtartó (frunk)', confirm_trunk_front: 'Megnyitod az elülső csomagtartót (frunk)?',
+    ph_pin: 'PIN (4 számjegy)', btn_valet_on: 'Valet mód bekapcsolása', btn_valet_off: 'Valet mód kikapcsolása',
+    ph_speed_limit: 'Sebességkorlát (km/h)', btn_speedlimit_on: 'Korlát bekapcsolása', btn_speedlimit_off: 'Korlát kikapcsolása', btn_speedlimit_set: 'Korlát beállítása',
+    label_precondition: 'Utastér előfűtése indulás előtt', label_offpeak: 'Kedvezményes időszaki töltés', title_offpeak_end: 'A kedvezményes időszak vége',
+    btn_save_schedule: 'Ütemezés mentése', btn_cancel_schedule: 'Ütemezés törlése',
+    label_version: 'Verzió', btn_check_update: 'Frissítés keresése', btn_install_update: 'Telepítés most', btn_cancel_update: 'Telepítés megszakítása',
+    btn_search_stations: 'Állomások keresése', msg_searching: 'Keresés...', msg_no_stations: 'Nem található közeli állomás.', msg_network_error_dot: 'Hálózati hiba.',
+    label_stalls_free: 'szabad', btn_navigate: 'Navigálás', btn_view_map: 'Megtekintés térképen', msg_unknown_error: 'Ismeretlen hiba',
+    msg_history_note: 'Ez automatikusan rögzül, amikor az autó legközelebb eléri a 100%-os töltöttséget. Legalább 2 adatpont szükséges a trend megjelenítéséhez.',
+    btn_refresh: 'Állapot frissítése', label_autorefresh: 'Automatikus frissítés:',
+    opt_off: 'Kikapcsolva', opt_30s: '30 másodperc', opt_1m: '1 perc', opt_3m: '3 perc', opt_5m: '5 perc', opt_10m: '10 perc',
+    btn_donate: 'Adományozz a projekt támogatásához',
+    label_lock: 'Zárolás', label_unlock: 'Kinyitás', label_climate_on: 'Klíma BE', label_climate_off: 'Klíma KI',
+    label_wake: 'Jármű ébresztése', label_vent_windows: 'Ablakok nyitása', label_close_windows: 'Ablakok zárása',
+    label_charge_start: 'Töltés indítása', label_charge_stop: 'Töltés leállítása', label_charge_port_open: 'Töltőnyílás fedelének nyitása', label_charge_port_close: 'Töltőnyílás fedelének zárása',
+    label_sentry_on: 'Sentry mód BE', label_sentry_off: 'Sentry mód KI',
+    label_seat_heater_on: 'Ülésfűtés BE', label_seat_heater_off: 'Ülésfűtés KI',
+    label_steering_heater_on: 'Kormányfűtés BE', label_steering_heater_off: 'Kormányfűtés KI',
+    label_valet_on: 'Valet mód BE', label_valet_off: 'Valet mód KI',
+    label_speed_limit_on: 'Sebességkorlát BE', label_speed_limit_off: 'Sebességkorlát KI', label_speed_limit_set: 'Sebességkorlát beállítása',
+    label_navigate_to: 'Navigálás', label_seat_heater_set: 'Ülésfűtés',
+    label_software_update_schedule: 'Frissítés ütemezése', label_software_update_cancel: 'Frissítés törlése',
+    label_temperature: 'Hőmérséklet', label_charge_limit: 'Töltési limit', label_charge_current: 'Töltőáram',
+    msg_sending: 'Küldés', msg_success_suffix: '— sikeres', msg_unknown_reason: 'ismeretlen ok', msg_network_error_prefix: 'Hálózati hiba',
+    msg_virtual_key_error: '{label}: a virtuális kulcs nincs párosítva a járművel. A telefonján, a Tesla alkalmazással megnyitva és az autó közelében, nyissa meg a {url} címet, és koppintson az „Add Key" gombra.',
+    msg_wake_sent: 'Ébresztés elküldve', msg_state_suffix: '(állapot: {state})',
+    msg_updating: 'Frissítés...', msg_updated: 'Frissítve.', msg_no_update: 'Nincs elérhető frissítés',
+    msg_new_version: 'Új verzió érhető el ({version}).', btn_download: 'Letöltés',
+    msg_adjusting_temp: 'Hőmérséklet beállítása...', msg_set_to: 'Beállítva: {value}',
+    msg_adjusting_charge_limit: 'Töltési limit beállítása...', msg_limit_set_to: 'Limit beállítva: {value}',
+    msg_adjusting_charge_amps: 'Töltőáram beállítása...', msg_amps_set_to: 'Áram beállítva: {value}',
+    msg_invalid_pin: 'Adjon meg egy 4 számjegyű PIN kódot.', msg_invalid_speed_limit: 'Adjon meg érvényes sebességkorlátot.', msg_choose_departure_time: 'Válasszon indulási időt.',
+    msg_checking_update: 'Frissítések keresése...', msg_update_available: 'Elérhető frissítés: {status}', msg_no_update_now: 'Jelenleg nincs elérhető frissítés.',
+    msg_vehicle_offline: 'a jármű nem érhető el: a jármű offline vagy alszik',
+    state_on: 'Bekapcsolva', state_off: 'Kikapcsolva', lang_picker_title: 'Válasszon nyelvet',
+  },
+  it: {
+    logout: 'Esci', status_loading: 'Caricamento...',
+    stat_battery: 'batteria', stat_range: 'autonomia', stat_access: 'accesso', stat_climate: 'climatizzazione',
+    tpms_title: 'Pressione pneumatici (Bar)', tpms_fl: 'Anteriore sinistro', tpms_fr: 'Anteriore destro', tpms_rl: 'Posteriore sinistro', tpms_rr: 'Posteriore destro',
+    tab_main: 'Principale', tab_advanced: 'Avanzate',
+    panel_safety_title: 'Accesso e sicurezza', panel_climate_title: 'Climatizzazione', panel_charging_title: 'Ricarica', panel_trunk_title: 'Bagagliaio',
+    panel_valet_title: 'Modalità valet e limite di velocità', panel_schedule_title: 'Partenza programmata', panel_update_title: 'Aggiornamento software',
+    panel_nearby_title: 'Stazioni di ricarica nelle vicinanze', panel_history_title: 'Autonomia al 100% (cronologia)',
+    btn_wake: 'Sveglia veicolo', btn_flash: 'Lampeggio fari', btn_honk: 'Clacson',
+    toggle_windows_label: 'Finestrini', state_windows_closed: 'Chiusi', state_windows_open: 'Aperti',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Blocco', state_lock_locked: 'Bloccata', state_lock_unlocked: 'Sbloccata',
+    label_in: 'Interno', label_out: 'Esterno', toggle_climate_label: 'Climatizzazione', toggle_seat_label: 'Sedile', toggle_steering_label: 'Volante',
+    seat_opt_1: 'Sedile riscaldato: Passeggero anteriore', seat_opt_2: 'Sedile riscaldato: Posteriore sinistro', seat_opt_4: 'Sedile riscaldato: Posteriore centrale', seat_opt_5: 'Sedile riscaldato: Posteriore destro',
+    btn_start: 'Attiva', btn_stop: 'Disattiva',
+    label_limit: 'Limite', label_state: 'Stato', label_charge_amps: 'Corrente di ricarica (risparmio)', btn_charge_start: 'Avvia', btn_charge_stop: 'Ferma',
+    toggle_chargeport_label: 'Sportello di ricarica', state_port_open: 'Aperto', state_port_closed: 'Chiuso',
+    btn_trunk_rear: 'Bagagliaio posteriore', confirm_trunk_rear: 'Aprire il bagagliaio posteriore?',
+    btn_trunk_front: 'Bagagliaio anteriore (frunk)', confirm_trunk_front: 'Aprire il bagagliaio anteriore (frunk)?',
+    ph_pin: 'PIN (4 cifre)', btn_valet_on: 'Attiva modalità valet', btn_valet_off: 'Disattiva modalità valet',
+    ph_speed_limit: 'Limite di velocità (km/h)', btn_speedlimit_on: 'Attiva limite', btn_speedlimit_off: 'Disattiva limite', btn_speedlimit_set: 'Imposta limite',
+    label_precondition: 'Precondiziona l\'abitacolo prima della partenza', label_offpeak: 'Ricarica in orario off-peak', title_offpeak_end: 'Ora in cui termina la tariffa ridotta',
+    btn_save_schedule: 'Salva programmazione', btn_cancel_schedule: 'Annulla programmazione',
+    label_version: 'Versione', btn_check_update: 'Controlla aggiornamento', btn_install_update: 'Installa ora', btn_cancel_update: 'Annulla installazione',
+    btn_search_stations: 'Cerca stazioni', msg_searching: 'Ricerca in corso...', msg_no_stations: 'Nessuna stazione trovata nelle vicinanze.', msg_network_error_dot: 'Errore di rete.',
+    label_stalls_free: 'liberi', btn_navigate: 'Naviga', btn_view_map: 'Vedi sulla mappa', msg_unknown_error: 'Errore sconosciuto',
+    msg_history_note: 'Viene registrato automaticamente la prossima volta che l\'auto raggiunge il 100% di carica. Sono necessari almeno 2 punti dati per mostrare una tendenza.',
+    btn_refresh: 'Aggiorna stato', label_autorefresh: 'Aggiornamento automatico:',
+    opt_off: 'Disattivato', opt_30s: '30 secondi', opt_1m: '1 minuto', opt_3m: '3 minuti', opt_5m: '5 minuti', opt_10m: '10 minuti',
+    btn_donate: 'Dona per sostenere il progetto',
+    label_lock: 'Blocco', label_unlock: 'Sblocco', label_climate_on: 'Climatizzazione ON', label_climate_off: 'Climatizzazione OFF',
+    label_wake: 'Sveglia veicolo', label_vent_windows: 'Apertura finestrini', label_close_windows: 'Chiusura finestrini',
+    label_charge_start: 'Avvia ricarica', label_charge_stop: 'Ferma ricarica', label_charge_port_open: 'Apertura sportello di ricarica', label_charge_port_close: 'Chiusura sportello di ricarica',
+    label_sentry_on: 'Modalità Sentry ON', label_sentry_off: 'Modalità Sentry OFF',
+    label_seat_heater_on: 'Sedile riscaldato ON', label_seat_heater_off: 'Sedile riscaldato OFF',
+    label_steering_heater_on: 'Volante riscaldato ON', label_steering_heater_off: 'Volante riscaldato OFF',
+    label_valet_on: 'Modalità valet ON', label_valet_off: 'Modalità valet OFF',
+    label_speed_limit_on: 'Limite di velocità ON', label_speed_limit_off: 'Limite di velocità OFF', label_speed_limit_set: 'Imposta limite di velocità',
+    label_navigate_to: 'Navigazione', label_seat_heater_set: 'Sedile riscaldato',
+    label_software_update_schedule: 'Programma aggiornamento', label_software_update_cancel: 'Annulla aggiornamento',
+    label_temperature: 'Temperatura', label_charge_limit: 'Limite di ricarica', label_charge_current: 'Corrente di ricarica',
+    msg_sending: 'Invio', msg_success_suffix: '— riuscito', msg_unknown_reason: 'motivo sconosciuto', msg_network_error_prefix: 'Errore di rete',
+    msg_virtual_key_error: '{label}: la chiave virtuale non è associata al veicolo. Sul telefono, con l\'app Tesla aperta e vicino all\'auto, apri {url} e tocca "Add Key".',
+    msg_wake_sent: 'Sveglia inviata', msg_state_suffix: '(stato: {state})',
+    msg_updating: 'Aggiornamento in corso...', msg_updated: 'Aggiornato.', msg_no_update: 'Nessun aggiornamento disponibile',
+    msg_new_version: 'È disponibile una nuova versione ({version}).', btn_download: 'Scarica',
+    msg_adjusting_temp: 'Regolazione della temperatura...', msg_set_to: 'Impostato a {value}',
+    msg_adjusting_charge_limit: 'Regolazione del limite di ricarica...', msg_limit_set_to: 'Limite impostato a {value}',
+    msg_adjusting_charge_amps: 'Regolazione della corrente di ricarica...', msg_amps_set_to: 'Corrente impostata a {value}',
+    msg_invalid_pin: 'Inserisci un PIN di 4 cifre.', msg_invalid_speed_limit: 'Inserisci un limite di velocità valido.', msg_choose_departure_time: 'Scegli un orario di partenza.',
+    msg_checking_update: 'Controllo aggiornamenti...', msg_update_available: 'Aggiornamento disponibile: {status}', msg_no_update_now: 'Nessun aggiornamento disponibile al momento.',
+    msg_vehicle_offline: 'veicolo non disponibile: il veicolo è offline o in modalità sospensione',
+    state_on: 'Attivo', state_off: 'Disattivo', lang_picker_title: 'Scegli la lingua',
+  },
+  es: {
+    logout: 'Cerrar sesión', status_loading: 'Cargando...',
+    stat_battery: 'batería', stat_range: 'autonomía', stat_access: 'acceso', stat_climate: 'climatización',
+    tpms_title: 'Presión de neumáticos (Bar)', tpms_fl: 'Delantero izquierdo', tpms_fr: 'Delantero derecho', tpms_rl: 'Trasero izquierdo', tpms_rr: 'Trasero derecho',
+    tab_main: 'Principal', tab_advanced: 'Avanzado',
+    panel_safety_title: 'Acceso y seguridad', panel_climate_title: 'Climatización', panel_charging_title: 'Carga', panel_trunk_title: 'Maletero',
+    panel_valet_title: 'Modo valet y límite de velocidad', panel_schedule_title: 'Salida programada', panel_update_title: 'Actualización de software',
+    panel_nearby_title: 'Estaciones de carga cercanas', panel_history_title: 'Autonomía al 100% (historial)',
+    btn_wake: 'Despertar vehículo', btn_flash: 'Destellar luces', btn_honk: 'Bocina',
+    toggle_windows_label: 'Ventanas', state_windows_closed: 'Cerradas', state_windows_open: 'Abiertas',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Bloqueo', state_lock_locked: 'Bloqueado', state_lock_unlocked: 'Desbloqueado',
+    label_in: 'Interior', label_out: 'Exterior', toggle_climate_label: 'Climatización', toggle_seat_label: 'Asiento', toggle_steering_label: 'Volante',
+    seat_opt_1: 'Asiento calefactado: Pasajero delantero', seat_opt_2: 'Asiento calefactado: Trasero izquierdo', seat_opt_4: 'Asiento calefactado: Trasero central', seat_opt_5: 'Asiento calefactado: Trasero derecho',
+    btn_start: 'Encender', btn_stop: 'Apagar',
+    label_limit: 'Límite', label_state: 'Estado', label_charge_amps: 'Corriente de carga (economía)', btn_charge_start: 'Iniciar', btn_charge_stop: 'Detener',
+    toggle_chargeport_label: 'Tapa de carga', state_port_open: 'Abierta', state_port_closed: 'Cerrada',
+    btn_trunk_rear: 'Maletero trasero', confirm_trunk_rear: '¿Abrir el maletero trasero?',
+    btn_trunk_front: 'Maletero delantero (frunk)', confirm_trunk_front: '¿Abrir el maletero delantero (frunk)?',
+    ph_pin: 'PIN (4 dígitos)', btn_valet_on: 'Activar modo valet', btn_valet_off: 'Desactivar modo valet',
+    ph_speed_limit: 'Límite de velocidad (km/h)', btn_speedlimit_on: 'Activar límite', btn_speedlimit_off: 'Desactivar límite', btn_speedlimit_set: 'Establecer límite',
+    label_precondition: 'Preacondicionar habitáculo antes de salir', label_offpeak: 'Carga en horario valle', title_offpeak_end: 'Hora en la que termina la tarifa reducida',
+    btn_save_schedule: 'Guardar programación', btn_cancel_schedule: 'Cancelar programación',
+    label_version: 'Versión', btn_check_update: 'Buscar actualización', btn_install_update: 'Instalar ahora', btn_cancel_update: 'Cancelar instalación',
+    btn_search_stations: 'Buscar estaciones', msg_searching: 'Buscando...', msg_no_stations: 'No se encontraron estaciones cercanas.', msg_network_error_dot: 'Error de red.',
+    label_stalls_free: 'libres', btn_navigate: 'Navegar', btn_view_map: 'Ver en el mapa', msg_unknown_error: 'Error desconocido',
+    msg_history_note: 'Esto se registra automáticamente la próxima vez que el coche alcance el 100% de carga. Se necesitan al menos 2 puntos de datos para mostrar una tendencia.',
+    btn_refresh: 'Actualizar estado', label_autorefresh: 'Actualización automática:',
+    opt_off: 'Desactivado', opt_30s: '30 segundos', opt_1m: '1 minuto', opt_3m: '3 minutos', opt_5m: '5 minutos', opt_10m: '10 minutos',
+    btn_donate: 'Dona para apoyar el proyecto',
+    label_lock: 'Bloqueo', label_unlock: 'Desbloqueo', label_climate_on: 'Climatización ON', label_climate_off: 'Climatización OFF',
+    label_wake: 'Despertar vehículo', label_vent_windows: 'Abrir ventanas', label_close_windows: 'Cerrar ventanas',
+    label_charge_start: 'Iniciar carga', label_charge_stop: 'Detener carga', label_charge_port_open: 'Abrir tapa de carga', label_charge_port_close: 'Cerrar tapa de carga',
+    label_sentry_on: 'Modo Sentry ON', label_sentry_off: 'Modo Sentry OFF',
+    label_seat_heater_on: 'Asiento calefactado ON', label_seat_heater_off: 'Asiento calefactado OFF',
+    label_steering_heater_on: 'Volante calefactado ON', label_steering_heater_off: 'Volante calefactado OFF',
+    label_valet_on: 'Modo valet ON', label_valet_off: 'Modo valet OFF',
+    label_speed_limit_on: 'Límite de velocidad ON', label_speed_limit_off: 'Límite de velocidad OFF', label_speed_limit_set: 'Establecer límite de velocidad',
+    label_navigate_to: 'Navegación', label_seat_heater_set: 'Asiento calefactado',
+    label_software_update_schedule: 'Programar actualización', label_software_update_cancel: 'Cancelar actualización',
+    label_temperature: 'Temperatura', label_charge_limit: 'Límite de carga', label_charge_current: 'Corriente de carga',
+    msg_sending: 'Enviando', msg_success_suffix: '— correcto', msg_unknown_reason: 'motivo desconocido', msg_network_error_prefix: 'Error de red',
+    msg_virtual_key_error: '{label}: la llave virtual no está emparejada con el vehículo. En tu teléfono, con la app de Tesla abierta y cerca del coche, abre {url} y toca "Add Key".',
+    msg_wake_sent: 'Despertar enviado', msg_state_suffix: '(estado: {state})',
+    msg_updating: 'Actualizando...', msg_updated: 'Actualizado.', msg_no_update: 'Sin actualización disponible',
+    msg_new_version: 'Hay una nueva versión disponible ({version}).', btn_download: 'Descargar',
+    msg_adjusting_temp: 'Ajustando temperatura...', msg_set_to: 'Ajustado a {value}',
+    msg_adjusting_charge_limit: 'Ajustando límite de carga...', msg_limit_set_to: 'Límite ajustado a {value}',
+    msg_adjusting_charge_amps: 'Ajustando corriente de carga...', msg_amps_set_to: 'Corriente ajustada a {value}',
+    msg_invalid_pin: 'Introduce un PIN de 4 dígitos.', msg_invalid_speed_limit: 'Introduce un límite de velocidad válido.', msg_choose_departure_time: 'Elige una hora de salida.',
+    msg_checking_update: 'Buscando actualizaciones...', msg_update_available: 'Actualización disponible: {status}', msg_no_update_now: 'No hay actualizaciones disponibles por el momento.',
+    msg_vehicle_offline: 'vehículo no disponible: el vehículo está fuera de línea o dormido',
+    state_on: 'Activado', state_off: 'Desactivado', lang_picker_title: 'Elige tu idioma',
+  },
+  pt: {
+    logout: 'Sair', status_loading: 'A carregar...',
+    stat_battery: 'bateria', stat_range: 'autonomia', stat_access: 'acesso', stat_climate: 'climatização',
+    tpms_title: 'Pressão dos pneus (Bar)', tpms_fl: 'Dianteiro esquerdo', tpms_fr: 'Dianteiro direito', tpms_rl: 'Traseiro esquerdo', tpms_rr: 'Traseiro direito',
+    tab_main: 'Principal', tab_advanced: 'Avançado',
+    panel_safety_title: 'Acesso e segurança', panel_climate_title: 'Climatização', panel_charging_title: 'Carregamento', panel_trunk_title: 'Porta-malas',
+    panel_valet_title: 'Modo valet e limite de velocidade', panel_schedule_title: 'Partida agendada', panel_update_title: 'Atualização de software',
+    panel_nearby_title: 'Estações de carregamento próximas', panel_history_title: 'Autonomia a 100% (histórico)',
+    btn_wake: 'Acordar veículo', btn_flash: 'Piscar faróis', btn_honk: 'Buzina',
+    toggle_windows_label: 'Janelas', state_windows_closed: 'Fechadas', state_windows_open: 'Abertas',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Bloqueio', state_lock_locked: 'Bloqueado', state_lock_unlocked: 'Desbloqueado',
+    label_in: 'Interior', label_out: 'Exterior', toggle_climate_label: 'Climatização', toggle_seat_label: 'Assento', toggle_steering_label: 'Volante',
+    seat_opt_1: 'Assento aquecido: Passageiro dianteiro', seat_opt_2: 'Assento aquecido: Traseiro esquerdo', seat_opt_4: 'Assento aquecido: Traseiro central', seat_opt_5: 'Assento aquecido: Traseiro direito',
+    btn_start: 'Ligar', btn_stop: 'Desligar',
+    label_limit: 'Limite', label_state: 'Estado', label_charge_amps: 'Corrente de carregamento (economia)', btn_charge_start: 'Iniciar', btn_charge_stop: 'Parar',
+    toggle_chargeport_label: 'Tampa de carregamento', state_port_open: 'Aberta', state_port_closed: 'Fechada',
+    btn_trunk_rear: 'Porta-malas traseiro', confirm_trunk_rear: 'Abrir o porta-malas traseiro?',
+    btn_trunk_front: 'Porta-malas dianteiro (frunk)', confirm_trunk_front: 'Abrir o porta-malas dianteiro (frunk)?',
+    ph_pin: 'PIN (4 dígitos)', btn_valet_on: 'Ativar modo valet', btn_valet_off: 'Desativar modo valet',
+    ph_speed_limit: 'Limite de velocidade (km/h)', btn_speedlimit_on: 'Ativar limite', btn_speedlimit_off: 'Desativar limite', btn_speedlimit_set: 'Definir limite',
+    label_precondition: 'Pré-condicionar habitáculo antes da partida', label_offpeak: 'Carregamento em horário fora de pico', title_offpeak_end: 'Hora em que termina a tarifa reduzida',
+    btn_save_schedule: 'Guardar agendamento', btn_cancel_schedule: 'Cancelar agendamento',
+    label_version: 'Versão', btn_check_update: 'Verificar atualização', btn_install_update: 'Instalar agora', btn_cancel_update: 'Cancelar instalação',
+    btn_search_stations: 'Procurar estações', msg_searching: 'A procurar...', msg_no_stations: 'Nenhuma estação encontrada nas proximidades.', msg_network_error_dot: 'Erro de rede.',
+    label_stalls_free: 'livres', btn_navigate: 'Navegar', btn_view_map: 'Ver no mapa', msg_unknown_error: 'Erro desconhecido',
+    msg_history_note: 'Isto é registado automaticamente da próxima vez que o carro atingir 100% de carga. São necessários pelo menos 2 pontos de dados para mostrar uma tendência.',
+    btn_refresh: 'Atualizar estado', label_autorefresh: 'Atualização automática:',
+    opt_off: 'Desativado', opt_30s: '30 segundos', opt_1m: '1 minuto', opt_3m: '3 minutos', opt_5m: '5 minutos', opt_10m: '10 minutos',
+    btn_donate: 'Doe para apoiar o projeto',
+    label_lock: 'Bloqueio', label_unlock: 'Desbloqueio', label_climate_on: 'Climatização ON', label_climate_off: 'Climatização OFF',
+    label_wake: 'Acordar veículo', label_vent_windows: 'Abrir janelas', label_close_windows: 'Fechar janelas',
+    label_charge_start: 'Iniciar carregamento', label_charge_stop: 'Parar carregamento', label_charge_port_open: 'Abrir tampa de carregamento', label_charge_port_close: 'Fechar tampa de carregamento',
+    label_sentry_on: 'Modo Sentry ON', label_sentry_off: 'Modo Sentry OFF',
+    label_seat_heater_on: 'Assento aquecido ON', label_seat_heater_off: 'Assento aquecido OFF',
+    label_steering_heater_on: 'Volante aquecido ON', label_steering_heater_off: 'Volante aquecido OFF',
+    label_valet_on: 'Modo valet ON', label_valet_off: 'Modo valet OFF',
+    label_speed_limit_on: 'Limite de velocidade ON', label_speed_limit_off: 'Limite de velocidade OFF', label_speed_limit_set: 'Definir limite de velocidade',
+    label_navigate_to: 'Navegação', label_seat_heater_set: 'Assento aquecido',
+    label_software_update_schedule: 'Agendar atualização', label_software_update_cancel: 'Cancelar atualização',
+    label_temperature: 'Temperatura', label_charge_limit: 'Limite de carga', label_charge_current: 'Corrente de carregamento',
+    msg_sending: 'A enviar', msg_success_suffix: '— sucesso', msg_unknown_reason: 'motivo desconhecido', msg_network_error_prefix: 'Erro de rede',
+    msg_virtual_key_error: '{label}: a chave virtual não está emparelhada com o veículo. No telemóvel, com a app Tesla aberta e perto do carro, abra {url} e toque em "Add Key".',
+    msg_wake_sent: 'Acordar enviado', msg_state_suffix: '(estado: {state})',
+    msg_updating: 'A atualizar...', msg_updated: 'Atualizado.', msg_no_update: 'Sem atualização disponível',
+    msg_new_version: 'Está disponível uma nova versão ({version}).', btn_download: 'Transferir',
+    msg_adjusting_temp: 'A ajustar temperatura...', msg_set_to: 'Definido para {value}',
+    msg_adjusting_charge_limit: 'A ajustar limite de carregamento...', msg_limit_set_to: 'Limite definido para {value}',
+    msg_adjusting_charge_amps: 'A ajustar corrente de carregamento...', msg_amps_set_to: 'Corrente definida para {value}',
+    msg_invalid_pin: 'Introduza um PIN de 4 dígitos.', msg_invalid_speed_limit: 'Introduza um limite de velocidade válido.', msg_choose_departure_time: 'Escolha uma hora de partida.',
+    msg_checking_update: 'A verificar atualizações...', msg_update_available: 'Atualização disponível: {status}', msg_no_update_now: 'Não há atualizações disponíveis no momento.',
+    msg_vehicle_offline: 'veículo indisponível: o veículo está offline ou em suspensão',
+    state_on: 'Ativado', state_off: 'Desativado', lang_picker_title: 'Escolha o seu idioma',
+  },
+  nl: {
+    logout: 'Uitloggen', status_loading: 'Laden...',
+    stat_battery: 'batterij', stat_range: 'bereik', stat_access: 'toegang', stat_climate: 'klimaat',
+    tpms_title: 'Bandenspanning (Bar)', tpms_fl: 'Voor links', tpms_fr: 'Voor rechts', tpms_rl: 'Achter links', tpms_rr: 'Achter rechts',
+    tab_main: 'Hoofdmenu', tab_advanced: 'Geavanceerd',
+    panel_safety_title: 'Toegang & beveiliging', panel_climate_title: 'Klimaat', panel_charging_title: 'Opladen', panel_trunk_title: 'Kofferbak',
+    panel_valet_title: 'Valet-modus & snelheidslimiet', panel_schedule_title: 'Geplande vertrek', panel_update_title: 'Software-update',
+    panel_nearby_title: 'Laadstations in de buurt', panel_history_title: 'Bereik bij 100% (geschiedenis)',
+    btn_wake: 'Voertuig wekken', btn_flash: 'Lichten knipperen', btn_honk: 'Claxon',
+    toggle_windows_label: 'Ramen', state_windows_closed: 'Gesloten', state_windows_open: 'Open',
+    toggle_sentry_label: 'Sentry', toggle_lock_label: 'Vergrendeling', state_lock_locked: 'Vergrendeld', state_lock_unlocked: 'Ontgrendeld',
+    label_in: 'Binnen', label_out: 'Buiten', toggle_climate_label: 'Klimaat', toggle_seat_label: 'Stoel', toggle_steering_label: 'Stuur',
+    seat_opt_1: 'Stoelverwarming: Voorpassagier', seat_opt_2: 'Stoelverwarming: Achter links', seat_opt_4: 'Stoelverwarming: Achter midden', seat_opt_5: 'Stoelverwarming: Achter rechts',
+    btn_start: 'Inschakelen', btn_stop: 'Uitschakelen',
+    label_limit: 'Limiet', label_state: 'Status', label_charge_amps: 'Laadstroom (zuinig)', btn_charge_start: 'Start', btn_charge_stop: 'Stop',
+    toggle_chargeport_label: 'Laadklep', state_port_open: 'Open', state_port_closed: 'Gesloten',
+    btn_trunk_rear: 'Achterbak', confirm_trunk_rear: 'Achterbak openen?',
+    btn_trunk_front: 'Voorbak (frunk)', confirm_trunk_front: 'Voorbak (frunk) openen?',
+    ph_pin: 'Pincode (4 cijfers)', btn_valet_on: 'Valet-modus inschakelen', btn_valet_off: 'Valet-modus uitschakelen',
+    ph_speed_limit: 'Snelheidslimiet (km/u)', btn_speedlimit_on: 'Limiet inschakelen', btn_speedlimit_off: 'Limiet uitschakelen', btn_speedlimit_set: 'Limiet instellen',
+    label_precondition: 'Cabine voorverwarmen voor vertrek', label_offpeak: 'Laden buiten piekuren', title_offpeak_end: 'Tijd waarop het daltarief eindigt',
+    btn_save_schedule: 'Planning opslaan', btn_cancel_schedule: 'Planning annuleren',
+    label_version: 'Versie', btn_check_update: 'Controleren op update', btn_install_update: 'Nu installeren', btn_cancel_update: 'Installatie annuleren',
+    btn_search_stations: 'Stations zoeken', msg_searching: 'Zoeken...', msg_no_stations: 'Geen stations in de buurt gevonden.', msg_network_error_dot: 'Netwerkfout.',
+    label_stalls_free: 'vrij', btn_navigate: 'Navigeren', btn_view_map: 'Bekijk op kaart', msg_unknown_error: 'Onbekende fout',
+    msg_history_note: 'Dit wordt automatisch geregistreerd de volgende keer dat de auto 100% lading bereikt. Er zijn minstens 2 datapunten nodig om een trend te tonen.',
+    btn_refresh: 'Status vernieuwen', label_autorefresh: 'Automatisch vernieuwen:',
+    opt_off: 'Uit', opt_30s: '30 seconden', opt_1m: '1 minuut', opt_3m: '3 minuten', opt_5m: '5 minuten', opt_10m: '10 minuten',
+    btn_donate: 'Doneer om het project te steunen',
+    label_lock: 'Vergrendeling', label_unlock: 'Ontgrendeling', label_climate_on: 'Klimaat AAN', label_climate_off: 'Klimaat UIT',
+    label_wake: 'Voertuig wekken', label_vent_windows: 'Ramen openen', label_close_windows: 'Ramen sluiten',
+    label_charge_start: 'Opladen starten', label_charge_stop: 'Opladen stoppen', label_charge_port_open: 'Laadklep openen', label_charge_port_close: 'Laadklep sluiten',
+    label_sentry_on: 'Sentry-modus AAN', label_sentry_off: 'Sentry-modus UIT',
+    label_seat_heater_on: 'Stoelverwarming AAN', label_seat_heater_off: 'Stoelverwarming UIT',
+    label_steering_heater_on: 'Stuurverwarming AAN', label_steering_heater_off: 'Stuurverwarming UIT',
+    label_valet_on: 'Valet-modus AAN', label_valet_off: 'Valet-modus UIT',
+    label_speed_limit_on: 'Snelheidslimiet AAN', label_speed_limit_off: 'Snelheidslimiet UIT', label_speed_limit_set: 'Snelheidslimiet instellen',
+    label_navigate_to: 'Navigatie', label_seat_heater_set: 'Stoelverwarming',
+    label_software_update_schedule: 'Update inplannen', label_software_update_cancel: 'Update annuleren',
+    label_temperature: 'Temperatuur', label_charge_limit: 'Laadlimiet', label_charge_current: 'Laadstroom',
+    msg_sending: 'Verzenden', msg_success_suffix: '— gelukt', msg_unknown_reason: 'onbekende reden', msg_network_error_prefix: 'Netwerkfout',
+    msg_virtual_key_error: '{label}: de virtuele sleutel is niet gekoppeld aan het voertuig. Open op je telefoon, met de Tesla-app open en in de buurt van de auto, {url} en tik op "Add Key".',
+    msg_wake_sent: 'Wekverzoek verzonden', msg_state_suffix: '(status: {state})',
+    msg_updating: 'Vernieuwen...', msg_updated: 'Vernieuwd.', msg_no_update: 'Geen update beschikbaar',
+    msg_new_version: 'Er is een nieuwe versie beschikbaar ({version}).', btn_download: 'Downloaden',
+    msg_adjusting_temp: 'Temperatuur aanpassen...', msg_set_to: 'Ingesteld op {value}',
+    msg_adjusting_charge_limit: 'Laadlimiet aanpassen...', msg_limit_set_to: 'Limiet ingesteld op {value}',
+    msg_adjusting_charge_amps: 'Laadstroom aanpassen...', msg_amps_set_to: 'Stroom ingesteld op {value}',
+    msg_invalid_pin: 'Voer een pincode van 4 cijfers in.', msg_invalid_speed_limit: 'Voer een geldige snelheidslimiet in.', msg_choose_departure_time: 'Kies een vertrektijd.',
+    msg_checking_update: 'Controleren op updates...', msg_update_available: 'Update beschikbaar: {status}', msg_no_update_now: 'Op dit moment geen update beschikbaar.',
+    msg_vehicle_offline: 'voertuig niet beschikbaar: het voertuig is offline of in slaapstand',
+    state_on: 'Aan', state_off: 'Uit', lang_picker_title: 'Kies je taal',
+  },
+};
+
+let currentLang = localStorage.getItem('lang') || 'ro';
+
+function tr(key) {
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.ro;
+  return (dict && dict[key]) || (TRANSLATIONS.ro[key]) || key;
+}
+
+function trf(key, vars) {
+  let s = tr(key);
+  for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+  return s;
+}
+
+let lastStatusError = null;
+
+function translateErrorMessage(raw) {
+  if (typeof raw !== 'string') return raw;
+  if (/vehicle unavailable/i.test(raw) && /offline or asleep/i.test(raw)) {
+    return tr('msg_vehicle_offline');
+  }
+  return raw;
+}
+
+function setErrorStatus(raw) {
+  lastStatusError = raw;
+  setStatus('❌ ' + translateErrorMessage(raw), 'error');
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = tr(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach((el) => {
+    el.setAttribute('placeholder', tr(el.getAttribute('data-i18n-ph')));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+    el.setAttribute('title', tr(el.getAttribute('data-i18n-title')));
+  });
+  const sel = document.getElementById('langSelect');
+  if (sel) sel.value = lang;
+  if (lastVehicleData) {
+    renderVehicleData(lastVehicleData);
+  }
+  Object.keys(TOGGLES).forEach((key) => {
+    if (!(key in toggleState)) renderToggleUnknown(key);
+  });
+  if (!batteryHistoryHasData) {
+    const chart = document.getElementById('batteryHistoryChart');
+    if (chart && chart.firstElementChild) {
+      chart.innerHTML = '<div class="battery-chart-note">' + tr('msg_history_note') + '</div>';
+    }
+  }
+  if (lastNearbySites) {
+    renderNearbySites(lastNearbySites);
+  }
+  if (lastStatusError) {
+    setErrorStatus(lastStatusError);
+  }
+}
+
+function selectInitialLanguage(lang) {
+  document.getElementById('langModal').style.display = 'none';
+  applyLanguage(lang);
+}
+
 const ICONS = {
   lock: '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" />',
   'lock-open': '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M8 11v-5a4 4 0 0 1 8 0" />',
@@ -332,18 +913,18 @@ function svgIcon(name, size) {
 }
 
 const LABELS = {
-  lock: 'Blocare', unlock: 'Deblocare', climate_on: 'Climatizare ON', climate_off: 'Climatizare OFF',
-  flash: 'Flash faruri', honk: 'Claxon', wake: 'Trezire mașină', vent_windows: 'Deschidere geamuri', close_windows: 'Închidere geamuri',
-  charge_start: 'Start încărcare', charge_stop: 'Stop încărcare', charge_port_open: 'Deschidere capac priză', charge_port_close: 'Închidere capac priză',
-  trunk_rear: 'Portbagaj spate', trunk_front: 'Portbagaj față (frunk)',
-  sentry_on: 'Sentry Mode ON', sentry_off: 'Sentry Mode OFF',
-  seat_heater_on: 'Scaun încălzit ON', seat_heater_off: 'Scaun încălzit OFF',
-  steering_heater_on: 'Volan încălzit ON', steering_heater_off: 'Volan încălzit OFF',
-  valet_on: 'Valet Mode ON', valet_off: 'Valet Mode OFF',
-  speed_limit_on: 'Limită viteză ON', speed_limit_off: 'Limită viteză OFF', speed_limit_set: 'Setare limită viteză',
-  schedule_departure: 'Plecare programată',
-  navigate_to: 'Navigare', seat_heater_set: 'Scaun încălzit',
-  software_update_schedule: 'Programare update', software_update_cancel: 'Anulare update',
+  lock: 'label_lock', unlock: 'label_unlock', climate_on: 'label_climate_on', climate_off: 'label_climate_off',
+  flash: 'btn_flash', honk: 'btn_honk', wake: 'label_wake', vent_windows: 'label_vent_windows', close_windows: 'label_close_windows',
+  charge_start: 'label_charge_start', charge_stop: 'label_charge_stop', charge_port_open: 'label_charge_port_open', charge_port_close: 'label_charge_port_close',
+  trunk_rear: 'btn_trunk_rear', trunk_front: 'btn_trunk_front',
+  sentry_on: 'label_sentry_on', sentry_off: 'label_sentry_off',
+  seat_heater_on: 'label_seat_heater_on', seat_heater_off: 'label_seat_heater_off',
+  steering_heater_on: 'label_steering_heater_on', steering_heater_off: 'label_steering_heater_off',
+  valet_on: 'label_valet_on', valet_off: 'label_valet_off',
+  speed_limit_on: 'label_speed_limit_on', speed_limit_off: 'label_speed_limit_off', speed_limit_set: 'label_speed_limit_set',
+  schedule_departure: 'panel_schedule_title',
+  navigate_to: 'label_navigate_to', seat_heater_set: 'label_seat_heater_set',
+  software_update_schedule: 'label_software_update_schedule', software_update_cancel: 'label_software_update_cancel',
 };
 const TPMS_LOW_BAR = 2.2;
 
@@ -356,23 +937,26 @@ function apiFetch(url, options) {
 }
 
 const TOGGLES = {
-  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'Climatizare', icon: 'snowflake' },
-  seat: { btn: 'toggleSeat', onCmd: 'seat_heater_on', offCmd: 'seat_heater_off', label: 'Scaun', icon: 'flame' },
-  steering: { btn: 'toggleSteering', onCmd: 'steering_heater_on', offCmd: 'steering_heater_off', label: 'Volan', icon: 'steering-wheel' },
-  sentry: { btn: 'toggleSentry', onCmd: 'sentry_on', offCmd: 'sentry_off', label: 'Sentry', icon: 'shield-lock' },
-  lock: { btn: 'toggleLock', onCmd: 'lock', offCmd: 'unlock', label: 'Blocare', onIcon: 'lock', offIcon: 'lock-open', onLabel: 'Blocată', offLabel: 'Deblocată' },
-  windows: { btn: 'toggleWindows', onCmd: 'close_windows', offCmd: 'vent_windows', label: 'Geamuri', icon: 'window', onLabel: 'Închise', offLabel: 'Deschise' },
-  chargePort: { btn: 'toggleChargePort', onCmd: 'charge_port_open', offCmd: 'charge_port_close', label: 'Capac priză', icon: 'plug-connected', onLabel: 'Deschis', offLabel: 'Închis' },
+  climate: { btn: 'toggleClimate', onCmd: 'climate_on', offCmd: 'climate_off', label: 'toggle_climate_label', icon: 'snowflake' },
+  seat: { btn: 'toggleSeat', onCmd: 'seat_heater_on', offCmd: 'seat_heater_off', label: 'toggle_seat_label', icon: 'flame' },
+  steering: { btn: 'toggleSteering', onCmd: 'steering_heater_on', offCmd: 'steering_heater_off', label: 'toggle_steering_label', icon: 'steering-wheel' },
+  sentry: { btn: 'toggleSentry', onCmd: 'sentry_on', offCmd: 'sentry_off', label: 'toggle_sentry_label', icon: 'shield-lock' },
+  lock: { btn: 'toggleLock', onCmd: 'lock', offCmd: 'unlock', label: 'toggle_lock_label', onIcon: 'lock', offIcon: 'lock-open', onLabel: 'state_lock_locked', offLabel: 'state_lock_unlocked' },
+  windows: { btn: 'toggleWindows', onCmd: 'close_windows', offCmd: 'vent_windows', label: 'toggle_windows_label', icon: 'window', onLabel: 'state_windows_closed', offLabel: 'state_windows_open' },
+  chargePort: { btn: 'toggleChargePort', onCmd: 'charge_port_open', offCmd: 'charge_port_close', label: 'toggle_chargeport_label', icon: 'plug-connected', onLabel: 'state_port_open', offLabel: 'state_port_closed' },
 };
 const toggleState = {};
+let lastVehicleData = null;
+let batteryHistoryHasData = false;
+let lastNearbySites = null;
 
 function renderToggle(key, isOn) {
   toggleState[key] = isOn;
   const t = TOGGLES[key];
   const btn = document.getElementById(t.btn);
-  const stateLabel = isOn ? (t.onLabel || 'Pornit') : (t.offLabel || 'Oprit');
+  const stateLabel = isOn ? tr(t.onLabel || 'state_on') : tr(t.offLabel || 'state_off');
   const iconName = isOn ? (t.onIcon || t.icon) : (t.offIcon || t.icon);
-  btn.innerHTML = svgIcon(iconName) + `<span>${t.label}: ${stateLabel}</span>`;
+  btn.innerHTML = svgIcon(iconName) + `<span>${tr(t.label)}: ${stateLabel}</span>`;
   btn.classList.toggle('on', isOn);
   if (key === 'lock') {
     document.getElementById('statLockIcon').innerHTML = svgIcon(iconName, 16);
@@ -383,25 +967,61 @@ function renderToggle(key, isOn) {
   }
 }
 
+function renderToggleUnknown(key) {
+  const t = TOGGLES[key];
+  const btn = document.getElementById(t.btn);
+  const iconName = t.icon || t.onIcon || t.offIcon;
+  btn.innerHTML = svgIcon(iconName) + `<span>${tr(t.label)}: –</span>`;
+  btn.classList.remove('on');
+}
+
+function renderVehicleData(d) {
+  const locked = d.vehicle_state ? !!d.vehicle_state.locked : null;
+  const climateOn = d.climate_state ? !!d.climate_state.is_climate_on : null;
+  document.getElementById('statLock').textContent = locked == null ? '–' : tr(locked ? 'state_lock_locked' : 'state_lock_unlocked');
+  document.getElementById('statClimate').textContent = climateOn == null ? '–' : tr(climateOn ? 'state_on' : 'state_off');
+  if (d.climate_state) {
+    renderToggle('climate', !!d.climate_state.is_climate_on);
+    renderToggle('seat', (d.climate_state.seat_heater_left || 0) > 0);
+    renderToggle('steering', !!d.climate_state.steering_wheel_heater);
+  }
+  if (d.vehicle_state) {
+    renderToggle('sentry', !!d.vehicle_state.sentry_mode);
+    renderToggle('lock', !!d.vehicle_state.locked);
+    const anyWindowOpen = [d.vehicle_state.fd_window, d.vehicle_state.fp_window, d.vehicle_state.rd_window, d.vehicle_state.rp_window].some((v) => v > 0);
+    renderToggle('windows', !anyWindowOpen);
+  }
+  if (d.charge_state) {
+    renderToggle('chargePort', !!d.charge_state.charge_port_door_open);
+  }
+  if (d.vehicle_state) {
+    document.getElementById('firmwareVersion').textContent = d.vehicle_state.car_version || '–';
+    const su = d.vehicle_state.software_update;
+    const statusText = su && su.status ? su.status + (su.download_perc ? ` (${su.download_perc}%)` : '') : tr('msg_no_update');
+    document.getElementById('updateStatus').textContent = statusText;
+  }
+}
+
 async function toggleFeature(key) {
   const t = TOGGLES[key];
   const goingOn = !toggleState[key];
   const cmd = goingOn ? t.onCmd : t.offCmd;
-  setStatus('Trimit: ' + t.label + '...', null);
+  const label = tr(t.label);
+  setStatus(tr('msg_sending') + ': ' + label + '...', null);
   try {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      showCommandError(t.label, j.error);
+      showCommandError(label, j.error);
     } else if (j.response && j.response.result === true) {
       renderToggle(key, goingOn);
       if ((key === 'seat' || key === 'steering') && goingOn) renderToggle('climate', true);
-      setStatus('✅ ' + t.label + ' — reușit', 'success');
+      setStatus('✅ ' + label + ' ' + tr('msg_success_suffix'), 'success');
     } else {
-      showCommandError(t.label, j.response && j.response.reason || 'motiv necunoscut');
+      showCommandError(label, j.response && j.response.reason || tr('msg_unknown_reason'));
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
@@ -419,22 +1039,20 @@ function showCommandError(label, message) {
   statusEl.classList.remove('success');
   statusEl.classList.add('error');
   if (typeof message === 'string' && /not been paired/i.test(message)) {
-    statusEl.innerHTML = '❌ ' + label + ': cheia virtuală nu e asociată cu mașina. ' +
-      'Pe telefon, cu aplicația Tesla deschisă și lângă mașină, accesează ' +
-      '<a href="' + VIRTUAL_KEY_URL + '" target="_blank" rel="noopener noreferrer">' + VIRTUAL_KEY_URL + '</a>' +
-      ' și apasă „Add Key”.';
+    const link = '<a href="' + VIRTUAL_KEY_URL + '" target="_blank" rel="noopener noreferrer">' + VIRTUAL_KEY_URL + '</a>';
+    statusEl.innerHTML = '❌ ' + trf('msg_virtual_key_error', { label, url: link });
   } else {
-    statusEl.textContent = '❌ ' + label + ': ' + message;
+    statusEl.textContent = '❌ ' + label + ': ' + translateErrorMessage(message);
   }
 }
 
-function confirmSend(cmd, message) {
-  if (window.confirm(message)) send(cmd);
+function confirmSend(cmd, msgKey) {
+  if (window.confirm(tr(msgKey))) send(cmd);
 }
 
 async function send(cmd, bodyObj) {
-  const label = LABELS[cmd] || cmd;
-  setStatus('Trimit: ' + label + '...', null);
+  const label = tr(LABELS[cmd] || cmd);
+  setStatus(tr('msg_sending') + ': ' + label + '...', null);
   try {
     const options = { method: 'POST' };
     if (bodyObj) {
@@ -447,16 +1065,16 @@ async function send(cmd, bodyObj) {
       showCommandError(label, j.error);
     } else if (cmd === 'wake') {
       const state = j.response && j.response.state;
-      setStatus('✅ Trezire trimisă' + (state ? ' (stare: ' + state + ')' : ''), 'success');
+      setStatus('✅ ' + tr('msg_wake_sent') + (state ? ' ' + trf('msg_state_suffix', { state }) : ''), 'success');
     } else if (j.response && j.response.result === true) {
-      setStatus('✅ ' + label + ' — reușit', 'success');
+      setStatus('✅ ' + label + ' ' + tr('msg_success_suffix'), 'success');
     } else if (j.response && j.response.result === false) {
-      showCommandError(label, j.response.reason || 'motiv necunoscut');
+      showCommandError(label, j.response.reason || tr('msg_unknown_reason'));
     } else {
       setStatus(label + ': ' + JSON.stringify(j), null);
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
@@ -487,50 +1105,29 @@ function updateExtraData(d) {
 }
 
 async function refreshStatus() {
-  setStatus('Se actualizează...', null);
+  setStatus(tr('msg_updating'), null);
   try {
     const r = await apiFetch('/api/status');
     const j = await r.json();
     if (j.response) {
       const d = j.response;
+      lastVehicleData = d;
+      lastStatusError = null;
       const battery = d.charge_state ? d.charge_state.battery_level : null;
       const rangeKm = d.charge_state && d.charge_state.battery_range != null ? (d.charge_state.battery_range * 1.60934).toFixed(0) : null;
-      const locked = d.vehicle_state ? !!d.vehicle_state.locked : null;
-      const climateOn = d.climate_state ? !!d.climate_state.is_climate_on : null;
       document.getElementById('statBattery').textContent = battery != null ? battery + '%' : '–';
       document.getElementById('statRange').textContent = rangeKm != null ? rangeKm + ' km' : '–';
-      document.getElementById('statLock').textContent = locked == null ? '–' : (locked ? 'Blocată' : 'Deblocată');
-      document.getElementById('statClimate').textContent = climateOn == null ? '–' : (climateOn ? 'Pornit' : 'Oprit');
-      setStatus('Actualizat.', 'success');
+      setStatus(tr('msg_updated'), 'success');
       updateTempReadout(d.climate_state);
       updateExtraData(d);
-      if (d.climate_state) {
-        renderToggle('climate', !!d.climate_state.is_climate_on);
-        renderToggle('seat', (d.climate_state.seat_heater_left || 0) > 0);
-        renderToggle('steering', !!d.climate_state.steering_wheel_heater);
-      }
-      if (d.vehicle_state) {
-        renderToggle('sentry', !!d.vehicle_state.sentry_mode);
-        renderToggle('lock', !!d.vehicle_state.locked);
-        const anyWindowOpen = [d.vehicle_state.fd_window, d.vehicle_state.fp_window, d.vehicle_state.rd_window, d.vehicle_state.rp_window].some((v) => v > 0);
-        renderToggle('windows', !anyWindowOpen);
-      }
-      if (d.charge_state) {
-        renderToggle('chargePort', !!d.charge_state.charge_port_door_open);
-      }
-      if (d.vehicle_state) {
-        document.getElementById('firmwareVersion').textContent = d.vehicle_state.car_version || '–';
-        const su = d.vehicle_state.software_update;
-        const statusText = su && su.status ? su.status + (su.download_perc ? ` (${su.download_perc}%)` : '') : 'Fără update disponibil';
-        document.getElementById('updateStatus').textContent = statusText;
-      }
+      renderVehicleData(d);
     } else if (j.error) {
-      setStatus('❌ ' + j.error, 'error');
+      setErrorStatus(j.error);
     } else {
       setStatus(JSON.stringify(j), null);
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
@@ -555,8 +1152,8 @@ async function checkForUpdate() {
     const remote = (await remoteRes.text()).trim();
     if (remote && isNewerVersion(remote, local)) {
       const banner = document.getElementById('updateBanner');
-      banner.innerHTML = 'A apărut o versiune nouă (' + remote + '). ' +
-        '<a href="https://www.grumpylabs.ro/remtes/download.php" target="_blank" rel="noopener noreferrer">Descarcă</a>';
+      banner.innerHTML = trf('msg_new_version', { version: remote }) + ' ' +
+        '<a href="https://www.grumpylabs.ro/remtes/download.php" target="_blank" rel="noopener noreferrer">' + tr('btn_download') + '</a>';
       banner.style.display = 'block';
     }
   } catch (e) {}
@@ -564,58 +1161,58 @@ async function checkForUpdate() {
 
 async function adjustTemp(direction) {
   const cmd = direction > 0 ? 'temp_up' : 'temp_down';
-  setStatus('Reglez temperatura...', null);
+  setStatus(tr('msg_adjusting_temp'), null);
   try {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      showCommandError('Temperatură', j.error);
+      showCommandError(tr('label_temperature'), j.error);
     } else if (j.response && j.response.result === true) {
       document.getElementById('tempTarget').textContent = j.newTemp.toFixed(1) + '°C';
-      setStatus('✅ Setat la ' + j.newTemp.toFixed(1) + '°C', 'success');
+      setStatus('✅ ' + trf('msg_set_to', { value: j.newTemp.toFixed(1) + '°C' }), 'success');
     } else {
-      showCommandError('Temperatură', j.response && j.response.reason || JSON.stringify(j));
+      showCommandError(tr('label_temperature'), j.response && j.response.reason || JSON.stringify(j));
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
 async function adjustChargeLimit(direction) {
   const cmd = direction > 0 ? 'charge_limit_up' : 'charge_limit_down';
-  setStatus('Reglez limita de încărcare...', null);
+  setStatus(tr('msg_adjusting_charge_limit'), null);
   try {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      showCommandError('Limită încărcare', j.error);
+      showCommandError(tr('label_charge_limit'), j.error);
     } else if (j.response && j.response.result === true) {
       document.getElementById('chargeLimitTarget').textContent = j.newLimit + '%';
-      setStatus('✅ Limită setată la ' + j.newLimit + '%', 'success');
+      setStatus('✅ ' + trf('msg_limit_set_to', { value: j.newLimit + '%' }), 'success');
     } else {
-      showCommandError('Limită încărcare', j.response && j.response.reason || JSON.stringify(j));
+      showCommandError(tr('label_charge_limit'), j.response && j.response.reason || JSON.stringify(j));
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
 async function adjustChargeAmps(direction) {
   const cmd = direction > 0 ? 'charge_amps_up' : 'charge_amps_down';
-  setStatus('Reglez curentul de încărcare...', null);
+  setStatus(tr('msg_adjusting_charge_amps'), null);
   try {
     const r = await apiFetch('/api/command/' + cmd, { method: 'POST' });
     const j = await r.json();
     if (j.error) {
-      showCommandError('Curent încărcare', j.error);
+      showCommandError(tr('label_charge_current'), j.error);
     } else if (j.response && j.response.result === true) {
       document.getElementById('chargeAmpsTarget').textContent = j.newAmps + ' A';
-      setStatus('✅ Curent setat la ' + j.newAmps + ' A', 'success');
+      setStatus('✅ ' + trf('msg_amps_set_to', { value: j.newAmps + ' A' }), 'success');
     } else {
-      showCommandError('Curent încărcare', j.response && j.response.reason || JSON.stringify(j));
+      showCommandError(tr('label_charge_current'), j.response && j.response.reason || JSON.stringify(j));
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
@@ -627,9 +1224,11 @@ async function renderBatteryHistory() {
     const chart = document.getElementById('batteryHistoryChart');
     panel.style.display = 'block';
     if (!Array.isArray(history) || history.length < 2) {
-      chart.innerHTML = '<div class="battery-chart-note">Se înregistrează automat data viitoare când mașina ajunge la 100% încărcare. Sunt necesare cel puțin 2 puncte pentru a arăta un trend.</div>';
+      batteryHistoryHasData = false;
+      chart.innerHTML = '<div class="battery-chart-note">' + tr('msg_history_note') + '</div>';
       return;
     }
+    batteryHistoryHasData = true;
     const toKm = (mi) => mi * 1.60934;
     const w = 600, h = 140, pad = 24;
     const values = history.map((p) => toKm(p.battery_range));
@@ -654,7 +1253,7 @@ async function renderBatteryHistory() {
 function readPin() {
   const pin = document.getElementById('pinInput').value.trim();
   if (!/^\d{4}$/.test(pin)) {
-    setStatus('❌ Introdu un PIN de 4 cifre.', 'error');
+    setStatus('❌ ' + tr('msg_invalid_pin'), 'error');
     return null;
   }
   return pin;
@@ -675,7 +1274,7 @@ async function speedLimitToggle(on) {
 async function speedLimitSet() {
   const kmh = parseFloat(document.getElementById('speedLimitInput').value);
   if (!kmh || kmh <= 0) {
-    setStatus('❌ Introdu o limită de viteză validă.', 'error');
+    setStatus('❌ ' + tr('msg_invalid_speed_limit'), 'error');
     return;
   }
   await send('speed_limit_set', { limit_mph: kmh / 1.60934 });
@@ -690,7 +1289,7 @@ function timeToMinutes(value) {
 async function saveScheduleDeparture() {
   const departure = timeToMinutes(document.getElementById('departureTime').value);
   if (departure == null) {
-    setStatus('❌ Alege o oră de plecare.', 'error');
+    setStatus('❌ ' + tr('msg_choose_departure_time'), 'error');
     return;
   }
   const preconditioning = document.getElementById('preconditionToggle').checked;
@@ -715,36 +1314,43 @@ async function cancelScheduleDeparture() {
   });
 }
 
+function renderNearbySites(sites) {
+  const list = document.getElementById('nearbyChargingList');
+  if (!sites.length) {
+    list.innerHTML = '<div class="battery-chart-note">' + tr('msg_no_stations') + '</div>';
+    return;
+  }
+  list.innerHTML = sites.map((s) => {
+    const km = (s.distance_miles * 1.60934).toFixed(1);
+    const stalls = s.available_stalls != null ? `<span>${s.available_stalls}/${s.total_stalls} ${tr('label_stalls_free')}</span>` : '';
+    const lat = s.location.lat, long = s.location.long;
+    const mapsUrl = `https://maps.google.com/maps?q=${lat},${long}`;
+    return `<div class="charging-site">
+      <div class="charging-site-info"><b>${s.name}</b><span>${km} km</span>${stalls}</div>
+      <div class="charging-site-actions">
+        <button onclick="navigateToSite(${lat}, ${long})">${tr('btn_navigate')}</button>
+        <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">${tr('btn_view_map')}</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadNearbyCharging() {
   const list = document.getElementById('nearbyChargingList');
-  list.innerHTML = '<div class="battery-chart-note">Se caută...</div>';
+  lastNearbySites = null;
+  list.innerHTML = '<div class="battery-chart-note">' + tr('msg_searching') + '</div>';
   try {
     const r = await apiFetch('/api/nearby-charging');
     const j = await r.json();
     if (!j.response) {
-      list.innerHTML = '<div class="battery-chart-note">' + (j.error || 'Eroare necunoscută') + '</div>';
+      list.innerHTML = '<div class="battery-chart-note">' + (j.error || tr('msg_unknown_error')) + '</div>';
       return;
     }
     const sites = [...(j.response.superchargers || []), ...(j.response.destination_charging || [])];
-    if (!sites.length) {
-      list.innerHTML = '<div class="battery-chart-note">Nicio stație găsită în apropiere.</div>';
-      return;
-    }
-    list.innerHTML = sites.map((s) => {
-      const km = (s.distance_miles * 1.60934).toFixed(1);
-      const stalls = s.available_stalls != null ? `<span>${s.available_stalls}/${s.total_stalls} libere</span>` : '';
-      const lat = s.location.lat, long = s.location.long;
-      const mapsUrl = `https://maps.google.com/maps?q=${lat},${long}`;
-      return `<div class="charging-site">
-        <div class="charging-site-info"><b>${s.name}</b><span>${km} km</span>${stalls}</div>
-        <div class="charging-site-actions">
-          <button onclick="navigateToSite(${lat}, ${long})">Navighează</button>
-          <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">Vezi pe hartă</a>
-        </div>
-      </div>`;
-    }).join('');
+    lastNearbySites = sites;
+    renderNearbySites(sites);
   } catch (e) {
-    list.innerHTML = '<div class="battery-chart-note">Eroare de rețea.</div>';
+    list.innerHTML = '<div class="battery-chart-note">' + tr('msg_network_error_dot') + '</div>';
   }
 }
 
@@ -758,27 +1364,29 @@ async function setPassengerSeatHeater(on) {
 }
 
 async function checkSoftwareUpdate() {
-  setStatus('Verific actualizări...', null);
+  setStatus(tr('msg_checking_update'), null);
   try {
     const r = await apiFetch('/api/status');
     const j = await r.json();
     if (j.response && j.response.vehicle_state) {
+      lastVehicleData = j.response;
+      lastStatusError = null;
       const vs = j.response.vehicle_state;
       document.getElementById('firmwareVersion').textContent = vs.car_version || '–';
       const su = vs.software_update;
       if (su && su.status) {
         const statusText = su.status + (su.download_perc ? ` (${su.download_perc}%)` : '');
         document.getElementById('updateStatus').textContent = statusText;
-        setStatus('✅ Actualizare disponibilă: ' + statusText, 'success');
+        setStatus('✅ ' + trf('msg_update_available', { status: statusText }), 'success');
       } else {
-        document.getElementById('updateStatus').textContent = 'Fără update disponibil';
-        setStatus('Nicio actualizare disponibilă momentan.', null);
+        document.getElementById('updateStatus').textContent = tr('msg_no_update');
+        setStatus(tr('msg_no_update_now'), null);
       }
     } else if (j.error) {
-      setStatus('❌ ' + j.error, 'error');
+      setErrorStatus(j.error);
     }
   } catch (e) {
-    setStatus('❌ Eroare de rețea: ' + e, 'error');
+    setStatus('❌ ' + tr('msg_network_error_prefix') + ': ' + e, 'error');
   }
 }
 
@@ -825,6 +1433,14 @@ function setAutoRefresh(seconds) {
 
 document.getElementById('statLockIcon').innerHTML = svgIcon('lock', 16);
 showTab(localStorage.getItem('activeTab') || 'main');
+
+const savedLang = localStorage.getItem('lang');
+if (savedLang) {
+  applyLanguage(savedLang);
+} else {
+  document.getElementById('langModal').style.display = 'flex';
+  applyLanguage('ro');
+}
 
 const savedAutoRefresh = localStorage.getItem('autoRefreshSeconds') || '0';
 document.getElementById('autoRefresh').value = savedAutoRefresh;
