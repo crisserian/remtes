@@ -211,6 +211,7 @@
         <button class="toggle-btn" id="toggleWindows" onclick="toggleFeature('windows')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3.866 0 -7 3.272 -7 7v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-10c0 -3.728 -3.134 -7 -7 -7" /><path d="M5 13l14 0" /><path d="M12 3l0 18" /></svg><span>Geamuri: –</span></button>
         <button class="toggle-btn" id="toggleSentry" onclick="toggleFeature('sentry')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M11 11a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 12l0 2.5" /></svg><span>Sentry: –</span></button>
         <button class="toggle-btn" id="toggleLock" onclick="toggleFeature('lock')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg><span>Blocare: –</span></button>
+        <button class="wide" onclick="viewLocation()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13.414 20.9a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 13.591 -4.629" /></svg><span data-i18n="btn_view_location">Vezi locația</span></button>
       </div>
     </div>
 
@@ -361,6 +362,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Valet & limitare viteză', panel_schedule_title: 'Plecare programată', panel_update_title: 'Actualizare software',
     panel_nearby_title: 'Stații de încărcare din apropiere', panel_history_title: 'Autonomie la 100% (istoric)',
     btn_wake: 'Trezește mașina', btn_flash: 'Flash faruri', btn_honk: 'Claxon',
+    btn_view_location: 'Vezi locația', msg_no_location: 'Locația nu e disponibilă — poate fi nevoie să te reloghezi pentru a acorda acces la locație.',
     toggle_windows_label: 'Geamuri', state_windows_closed: 'Închise', state_windows_open: 'Deschise',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Blocare', state_lock_locked: 'Blocată', state_lock_unlocked: 'Deblocată',
     label_in: 'In', label_out: 'Out', toggle_climate_label: 'Climatizare', toggle_seat_label: 'Scaun', toggle_steering_label: 'Volan',
@@ -414,6 +416,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Valet & speed limit', panel_schedule_title: 'Scheduled departure', panel_update_title: 'Software update',
     panel_nearby_title: 'Nearby charging stations', panel_history_title: 'Range at 100% (history)',
     btn_wake: 'Wake vehicle', btn_flash: 'Flash lights', btn_honk: 'Honk horn',
+    btn_view_location: 'View location', msg_no_location: 'Location not available — you may need to log out and log back in to grant location access.',
     toggle_windows_label: 'Windows', state_windows_closed: 'Closed', state_windows_open: 'Open',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Lock', state_lock_locked: 'Locked', state_lock_unlocked: 'Unlocked',
     label_in: 'In', label_out: 'Out', toggle_climate_label: 'Climate', toggle_seat_label: 'Seat', toggle_steering_label: 'Steering wheel',
@@ -467,6 +470,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Valet-Modus & Geschwindigkeitsbegrenzung', panel_schedule_title: 'Geplante Abfahrt', panel_update_title: 'Software-Update',
     panel_nearby_title: 'Ladestationen in der Nähe', panel_history_title: 'Reichweite bei 100% (Verlauf)',
     btn_wake: 'Fahrzeug aufwecken', btn_flash: 'Lichthupe', btn_honk: 'Hupen',
+    btn_view_location: 'Standort anzeigen', msg_no_location: 'Standort nicht verfügbar — möglicherweise musst du dich ab- und wieder anmelden, um den Standortzugriff zu gewähren.',
     toggle_windows_label: 'Fenster', state_windows_closed: 'Geschlossen', state_windows_open: 'Geöffnet',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Verriegelung', state_lock_locked: 'Verriegelt', state_lock_unlocked: 'Entriegelt',
     label_in: 'Innen', label_out: 'Außen', toggle_climate_label: 'Klima', toggle_seat_label: 'Sitz', toggle_steering_label: 'Lenkrad',
@@ -520,6 +524,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Mode voiturier et limite de vitesse', panel_schedule_title: 'Départ programmé', panel_update_title: 'Mise à jour logicielle',
     panel_nearby_title: 'Bornes de recharge à proximité', panel_history_title: 'Autonomie à 100 % (historique)',
     btn_wake: 'Réveiller le véhicule', btn_flash: 'Clignoter les phares', btn_honk: 'Klaxonner',
+    btn_view_location: 'Voir la position', msg_no_location: 'Position non disponible — vous devrez peut-être vous déconnecter puis vous reconnecter pour autoriser l\'accès à la position.',
     toggle_windows_label: 'Vitres', state_windows_closed: 'Fermées', state_windows_open: 'Ouvertes',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Verrouillage', state_lock_locked: 'Verrouillée', state_lock_unlocked: 'Déverrouillée',
     label_in: 'Intérieur', label_out: 'Extérieur', toggle_climate_label: 'Climatisation', toggle_seat_label: 'Siège', toggle_steering_label: 'Volant',
@@ -573,6 +578,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Valet mód és sebességkorlátozás', panel_schedule_title: 'Ütemezett indulás', panel_update_title: 'Szoftverfrissítés',
     panel_nearby_title: 'Közeli töltőállomások', panel_history_title: 'Hatótávolság 100%-nál (előzmények)',
     btn_wake: 'Jármű felébresztése', btn_flash: 'Fényszóró villogtatása', btn_honk: 'Kürt',
+    btn_view_location: 'Helyzet megtekintése', msg_no_location: 'A helyzet nem érhető el — lehet, hogy ki kell jelentkezned, majd újra be kell jelentkezned a helyhozzáférés engedélyezéséhez.',
     toggle_windows_label: 'Ablakok', state_windows_closed: 'Zárva', state_windows_open: 'Nyitva',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Zárolás', state_lock_locked: 'Zárva', state_lock_unlocked: 'Kinyitva',
     label_in: 'Bent', label_out: 'Kint', toggle_climate_label: 'Klíma', toggle_seat_label: 'Ülés', toggle_steering_label: 'Kormánykerék',
@@ -626,6 +632,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Modalità valet e limite di velocità', panel_schedule_title: 'Partenza programmata', panel_update_title: 'Aggiornamento software',
     panel_nearby_title: 'Stazioni di ricarica nelle vicinanze', panel_history_title: 'Autonomia al 100% (cronologia)',
     btn_wake: 'Sveglia veicolo', btn_flash: 'Lampeggio fari', btn_honk: 'Clacson',
+    btn_view_location: 'Visualizza posizione', msg_no_location: 'Posizione non disponibile — potrebbe essere necessario disconnettersi e riconnettersi per concedere l\'accesso alla posizione.',
     toggle_windows_label: 'Finestrini', state_windows_closed: 'Chiusi', state_windows_open: 'Aperti',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Blocco', state_lock_locked: 'Bloccata', state_lock_unlocked: 'Sbloccata',
     label_in: 'Interno', label_out: 'Esterno', toggle_climate_label: 'Climatizzazione', toggle_seat_label: 'Sedile', toggle_steering_label: 'Volante',
@@ -679,6 +686,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Modo valet y límite de velocidad', panel_schedule_title: 'Salida programada', panel_update_title: 'Actualización de software',
     panel_nearby_title: 'Estaciones de carga cercanas', panel_history_title: 'Autonomía al 100% (historial)',
     btn_wake: 'Despertar vehículo', btn_flash: 'Destellar luces', btn_honk: 'Bocina',
+    btn_view_location: 'Ver ubicación', msg_no_location: 'Ubicación no disponible — puede que debas cerrar sesión y volver a iniciarla para conceder acceso a la ubicación.',
     toggle_windows_label: 'Ventanas', state_windows_closed: 'Cerradas', state_windows_open: 'Abiertas',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Bloqueo', state_lock_locked: 'Bloqueado', state_lock_unlocked: 'Desbloqueado',
     label_in: 'Interior', label_out: 'Exterior', toggle_climate_label: 'Climatización', toggle_seat_label: 'Asiento', toggle_steering_label: 'Volante',
@@ -732,6 +740,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Modo valet e limite de velocidade', panel_schedule_title: 'Partida agendada', panel_update_title: 'Atualização de software',
     panel_nearby_title: 'Estações de carregamento próximas', panel_history_title: 'Autonomia a 100% (histórico)',
     btn_wake: 'Acordar veículo', btn_flash: 'Piscar faróis', btn_honk: 'Buzina',
+    btn_view_location: 'Ver localização', msg_no_location: 'Localização não disponível — pode ser necessário terminar sessão e voltar a iniciar sessão para conceder acesso à localização.',
     toggle_windows_label: 'Janelas', state_windows_closed: 'Fechadas', state_windows_open: 'Abertas',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Bloqueio', state_lock_locked: 'Bloqueado', state_lock_unlocked: 'Desbloqueado',
     label_in: 'Interior', label_out: 'Exterior', toggle_climate_label: 'Climatização', toggle_seat_label: 'Assento', toggle_steering_label: 'Volante',
@@ -785,6 +794,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Valet-modus & snelheidslimiet', panel_schedule_title: 'Geplande vertrek', panel_update_title: 'Software-update',
     panel_nearby_title: 'Laadstations in de buurt', panel_history_title: 'Bereik bij 100% (geschiedenis)',
     btn_wake: 'Voertuig wekken', btn_flash: 'Lichten knipperen', btn_honk: 'Claxon',
+    btn_view_location: 'Locatie bekijken', msg_no_location: 'Locatie niet beschikbaar — mogelijk moet je uitloggen en opnieuw inloggen om locatietoegang te verlenen.',
     toggle_windows_label: 'Ramen', state_windows_closed: 'Gesloten', state_windows_open: 'Open',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Vergrendeling', state_lock_locked: 'Vergrendeld', state_lock_unlocked: 'Ontgrendeld',
     label_in: 'Binnen', label_out: 'Buiten', toggle_climate_label: 'Klimaat', toggle_seat_label: 'Stoel', toggle_steering_label: 'Stuur',
@@ -838,6 +848,7 @@ const TRANSLATIONS = {
     panel_valet_title: 'Λειτουργία Valet & όριο ταχύτητας', panel_schedule_title: 'Προγραμματισμένη αναχώρηση', panel_update_title: 'Ενημέρωση λογισμικού',
     panel_nearby_title: 'Κοντινοί σταθμοί φόρτισης', panel_history_title: 'Αυτονομία στο 100% (ιστορικό)',
     btn_wake: 'Αφύπνιση οχήματος', btn_flash: 'Αναβοσβήσιμο φώτων', btn_honk: 'Κόρνα',
+    btn_view_location: 'Προβολή τοποθεσίας', msg_no_location: 'Η τοποθεσία δεν είναι διαθέσιμη — ίσως χρειαστεί να αποσυνδεθείς και να συνδεθείς ξανά για να δώσεις πρόσβαση στην τοποθεσία.',
     toggle_windows_label: 'Παράθυρα', state_windows_closed: 'Κλειστά', state_windows_open: 'Ανοιχτά',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Κλείδωμα', state_lock_locked: 'Κλειδωμένο', state_lock_unlocked: 'Ξεκλείδωτο',
     label_in: 'Μέσα', label_out: 'Έξω', toggle_climate_label: 'Κλιματισμός', toggle_seat_label: 'Κάθισμα', toggle_steering_label: 'Τιμόνι',
@@ -1411,6 +1422,18 @@ async function loadNearbyCharging() {
 
 async function navigateToSite(lat, long) {
   await send('navigate_to', { lat, long });
+}
+
+function viewLocation() {
+  const drive = lastVehicleData && lastVehicleData.drive_state;
+  const lat = drive && drive.latitude;
+  const long = drive && drive.longitude;
+  if (lat == null || long == null) {
+    setStatus('❌ ' + tr('msg_no_location'), 'error');
+    return;
+  }
+  const mapsUrl = `https://maps.google.com/maps?q=${lat},${long}`;
+  window.open(mapsUrl, '_blank', 'noopener,noreferrer');
 }
 
 async function setPassengerSeatHeater(on) {

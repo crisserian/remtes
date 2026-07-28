@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.0
+- **RO:** Adăugat: buton „Vezi locația" în panoul „Acces & siguranță" — deschide poziția curentă a mașinii în Google Maps. Necesită scope-ul OAuth `vehicle_location`, adăugat acum la login — utilizatorii care erau deja logați trebuie să iasă din cont și să se relogheze o dată, ca să acorde acest permis nou.
+- **EN:** Added: "View location" button in the "Access & security" panel — opens the vehicle's current position in Google Maps. Requires the `vehicle_location` OAuth scope, added now at login — users who were already logged in need to log out and log back in once, to grant this new permission.
+
 ### 1.1.3
 - **RO:** Adăugat: greaca (Ελληνικά) ca a 10-a limbă a interfeței, selectabilă la prima pornire și din antet.
 - **EN:** Added: Greek (Ελληνικά) as the app's 10th interface language, selectable on first run and from the header.
