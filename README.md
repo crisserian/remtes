@@ -163,6 +163,16 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.2
+- **RO:** Fix: locația mașinii tot nu apărea nici după relogare. Cauza: `location_data` e protejat separat de scope-ul OAuth — Tesla nu-l include implicit în răspunsul `vehicle_data`, chiar dacă scope-ul `vehicle_location` e acordat; trebuie cerut explicit prin parametrul `endpoints`. Serverul local cere acum explicit `location_data` și îl îmbină cu restul datelor mașinii.
+- **EN:** Fix: the vehicle's location still didn't show up even after re-login. Cause: `location_data` is gated separately from the OAuth scope — Tesla doesn't include it by default in the `vehicle_data` response even when the `vehicle_location` scope is granted; it must be requested explicitly via the `endpoints` parameter. The local server now explicitly requests `location_data` and merges it into the rest of the vehicle data.
+- **RO:** Fix: textul roșu de eroare „Locația nu e disponibilă..." rămânea în limba în care apăruse prima dată și nu se retraducea la schimbarea limbii, spre deosebire de celelalte mesaje de stare.
+- **EN:** Fix: the red "Location not available..." error text stayed in whichever language it first appeared in and didn't re-translate on language switch, unlike other status messages.
+
+### 1.2.1
+- **RO:** Adăugat: un banner discret ("Noutate în această versiune...") care apare automat pentru userii deja logați dacă locația mașinii nu e disponibilă (adică nu au încă permisul `vehicle_location`), cu buton „Am înțeles" pentru a-l închide definitiv. Banner-ul nu mai apare deloc odată ce datele de locație sosesc cu succes.
+- **EN:** Added: a discreet banner ("New in this version...") that appears automatically for already-logged-in users if the vehicle's location isn't available (i.e. they don't yet have the `vehicle_location` permission), with a "Got it" button to dismiss it permanently. The banner stops appearing entirely once location data arrives successfully.
+
 ### 1.2.0
 - **RO:** Adăugat: buton „Vezi locația" în panoul „Acces & siguranță" — deschide poziția curentă a mașinii în Google Maps. Necesită scope-ul OAuth `vehicle_location`, adăugat acum la login — utilizatorii care erau deja logați trebuie să iasă din cont și să se relogheze o dată, ca să acorde acest permis nou.
 - **EN:** Added: "View location" button in the "Access & security" panel — opens the vehicle's current position in Google Maps. Requires the `vehicle_location` OAuth scope, added now at login — users who were already logged in need to log out and log back in once, to grant this new permission.

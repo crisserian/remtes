@@ -28,6 +28,8 @@
   .status.error { border-color: rgba(255,107,107,.4); color: var(--danger); }
   .update-banner { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.35); color: var(--gold); border-radius: 10px; padding: .6rem .8rem; margin-bottom: .6rem; font-size: .8rem; }
   .update-banner a { color: var(--gold); font-weight: 700; text-decoration: underline; }
+  .notice-banner { background: rgba(0,212,170,.1); border-color: rgba(0,212,170,.35); color: var(--accent2); display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+  .notice-dismiss { background: rgba(0,212,170,.15); border: 1px solid rgba(0,212,170,.4); color: var(--accent2); border-radius: 8px; padding: .3rem .6rem; font-size: .72rem; font-weight: 700; cursor: pointer; flex-shrink: 0; }
   .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: .6rem; }
   .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .4rem .3rem; text-align: center; }
   .stat-icon { color: var(--accent2); margin: 0 auto .3rem; width: 16px; height: 16px; }
@@ -161,6 +163,7 @@
     </div>
   </div>
   <div class="update-banner" id="updateBanner" style="display:none"></div>
+  <div class="update-banner notice-banner" id="locationNotice" style="display:none"></div>
   <div class="status" id="status">Se încarcă...</div>
 
   <div class="stat-cards">
@@ -363,6 +366,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Stații de încărcare din apropiere', panel_history_title: 'Autonomie la 100% (istoric)',
     btn_wake: 'Trezește mașina', btn_flash: 'Flash faruri', btn_honk: 'Claxon',
     btn_view_location: 'Vezi locația', msg_no_location: 'Locația nu e disponibilă — poate fi nevoie să te reloghezi pentru a acorda acces la locație.',
+    msg_location_notice: 'Noutate în această versiune: poți vedea locația mașinii. Ieși din cont și loghează-te din nou o dată, ca să acorzi acest permis.', btn_got_it: 'Am înțeles',
     toggle_windows_label: 'Geamuri', state_windows_closed: 'Închise', state_windows_open: 'Deschise',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Blocare', state_lock_locked: 'Blocată', state_lock_unlocked: 'Deblocată',
     label_in: 'In', label_out: 'Out', toggle_climate_label: 'Climatizare', toggle_seat_label: 'Scaun', toggle_steering_label: 'Volan',
@@ -417,6 +421,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Nearby charging stations', panel_history_title: 'Range at 100% (history)',
     btn_wake: 'Wake vehicle', btn_flash: 'Flash lights', btn_honk: 'Honk horn',
     btn_view_location: 'View location', msg_no_location: 'Location not available — you may need to log out and log back in to grant location access.',
+    msg_location_notice: 'New in this version: you can view your vehicle\'s location. Log out and log back in once to grant access.', btn_got_it: 'Got it',
     toggle_windows_label: 'Windows', state_windows_closed: 'Closed', state_windows_open: 'Open',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Lock', state_lock_locked: 'Locked', state_lock_unlocked: 'Unlocked',
     label_in: 'In', label_out: 'Out', toggle_climate_label: 'Climate', toggle_seat_label: 'Seat', toggle_steering_label: 'Steering wheel',
@@ -471,6 +476,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Ladestationen in der Nähe', panel_history_title: 'Reichweite bei 100% (Verlauf)',
     btn_wake: 'Fahrzeug aufwecken', btn_flash: 'Lichthupe', btn_honk: 'Hupen',
     btn_view_location: 'Standort anzeigen', msg_no_location: 'Standort nicht verfügbar — möglicherweise musst du dich ab- und wieder anmelden, um den Standortzugriff zu gewähren.',
+    msg_location_notice: 'Neu in dieser Version: du kannst den Standort deines Fahrzeugs sehen. Melde dich einmal ab und wieder an, um den Zugriff zu gewähren.', btn_got_it: 'Verstanden',
     toggle_windows_label: 'Fenster', state_windows_closed: 'Geschlossen', state_windows_open: 'Geöffnet',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Verriegelung', state_lock_locked: 'Verriegelt', state_lock_unlocked: 'Entriegelt',
     label_in: 'Innen', label_out: 'Außen', toggle_climate_label: 'Klima', toggle_seat_label: 'Sitz', toggle_steering_label: 'Lenkrad',
@@ -525,6 +531,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Bornes de recharge à proximité', panel_history_title: 'Autonomie à 100 % (historique)',
     btn_wake: 'Réveiller le véhicule', btn_flash: 'Clignoter les phares', btn_honk: 'Klaxonner',
     btn_view_location: 'Voir la position', msg_no_location: 'Position non disponible — vous devrez peut-être vous déconnecter puis vous reconnecter pour autoriser l\'accès à la position.',
+    msg_location_notice: 'Nouveau dans cette version : vous pouvez voir la position de votre véhicule. Déconnectez-vous puis reconnectez-vous une fois pour autoriser l\'accès.', btn_got_it: 'Compris',
     toggle_windows_label: 'Vitres', state_windows_closed: 'Fermées', state_windows_open: 'Ouvertes',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Verrouillage', state_lock_locked: 'Verrouillée', state_lock_unlocked: 'Déverrouillée',
     label_in: 'Intérieur', label_out: 'Extérieur', toggle_climate_label: 'Climatisation', toggle_seat_label: 'Siège', toggle_steering_label: 'Volant',
@@ -579,6 +586,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Közeli töltőállomások', panel_history_title: 'Hatótávolság 100%-nál (előzmények)',
     btn_wake: 'Jármű felébresztése', btn_flash: 'Fényszóró villogtatása', btn_honk: 'Kürt',
     btn_view_location: 'Helyzet megtekintése', msg_no_location: 'A helyzet nem érhető el — lehet, hogy ki kell jelentkezned, majd újra be kell jelentkezned a helyhozzáférés engedélyezéséhez.',
+    msg_location_notice: 'Újdonság ebben a verzióban: megtekintheted a jármű helyzetét. Jelentkezz ki, majd jelentkezz be újra egyszer, hogy engedélyezd a hozzáférést.', btn_got_it: 'Rendben',
     toggle_windows_label: 'Ablakok', state_windows_closed: 'Zárva', state_windows_open: 'Nyitva',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Zárolás', state_lock_locked: 'Zárva', state_lock_unlocked: 'Kinyitva',
     label_in: 'Bent', label_out: 'Kint', toggle_climate_label: 'Klíma', toggle_seat_label: 'Ülés', toggle_steering_label: 'Kormánykerék',
@@ -633,6 +641,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Stazioni di ricarica nelle vicinanze', panel_history_title: 'Autonomia al 100% (cronologia)',
     btn_wake: 'Sveglia veicolo', btn_flash: 'Lampeggio fari', btn_honk: 'Clacson',
     btn_view_location: 'Visualizza posizione', msg_no_location: 'Posizione non disponibile — potrebbe essere necessario disconnettersi e riconnettersi per concedere l\'accesso alla posizione.',
+    msg_location_notice: 'Novità in questa versione: puoi vedere la posizione del tuo veicolo. Disconnettiti e riconnettiti una volta per concedere l\'accesso.', btn_got_it: 'Capito',
     toggle_windows_label: 'Finestrini', state_windows_closed: 'Chiusi', state_windows_open: 'Aperti',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Blocco', state_lock_locked: 'Bloccata', state_lock_unlocked: 'Sbloccata',
     label_in: 'Interno', label_out: 'Esterno', toggle_climate_label: 'Climatizzazione', toggle_seat_label: 'Sedile', toggle_steering_label: 'Volante',
@@ -687,6 +696,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Estaciones de carga cercanas', panel_history_title: 'Autonomía al 100% (historial)',
     btn_wake: 'Despertar vehículo', btn_flash: 'Destellar luces', btn_honk: 'Bocina',
     btn_view_location: 'Ver ubicación', msg_no_location: 'Ubicación no disponible — puede que debas cerrar sesión y volver a iniciarla para conceder acceso a la ubicación.',
+    msg_location_notice: 'Novedad en esta versión: puedes ver la ubicación de tu vehículo. Cierra sesión y vuelve a iniciarla una vez para conceder acceso.', btn_got_it: 'Entendido',
     toggle_windows_label: 'Ventanas', state_windows_closed: 'Cerradas', state_windows_open: 'Abiertas',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Bloqueo', state_lock_locked: 'Bloqueado', state_lock_unlocked: 'Desbloqueado',
     label_in: 'Interior', label_out: 'Exterior', toggle_climate_label: 'Climatización', toggle_seat_label: 'Asiento', toggle_steering_label: 'Volante',
@@ -741,6 +751,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Estações de carregamento próximas', panel_history_title: 'Autonomia a 100% (histórico)',
     btn_wake: 'Acordar veículo', btn_flash: 'Piscar faróis', btn_honk: 'Buzina',
     btn_view_location: 'Ver localização', msg_no_location: 'Localização não disponível — pode ser necessário terminar sessão e voltar a iniciar sessão para conceder acesso à localização.',
+    msg_location_notice: 'Novidade nesta versão: podes ver a localização do teu veículo. Termina sessão e inicia sessão novamente uma vez para conceder acesso.', btn_got_it: 'Entendi',
     toggle_windows_label: 'Janelas', state_windows_closed: 'Fechadas', state_windows_open: 'Abertas',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Bloqueio', state_lock_locked: 'Bloqueado', state_lock_unlocked: 'Desbloqueado',
     label_in: 'Interior', label_out: 'Exterior', toggle_climate_label: 'Climatização', toggle_seat_label: 'Assento', toggle_steering_label: 'Volante',
@@ -795,6 +806,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Laadstations in de buurt', panel_history_title: 'Bereik bij 100% (geschiedenis)',
     btn_wake: 'Voertuig wekken', btn_flash: 'Lichten knipperen', btn_honk: 'Claxon',
     btn_view_location: 'Locatie bekijken', msg_no_location: 'Locatie niet beschikbaar — mogelijk moet je uitloggen en opnieuw inloggen om locatietoegang te verlenen.',
+    msg_location_notice: 'Nieuw in deze versie: je kunt de locatie van je voertuig bekijken. Log eenmalig uit en weer in om toegang te verlenen.', btn_got_it: 'Begrepen',
     toggle_windows_label: 'Ramen', state_windows_closed: 'Gesloten', state_windows_open: 'Open',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Vergrendeling', state_lock_locked: 'Vergrendeld', state_lock_unlocked: 'Ontgrendeld',
     label_in: 'Binnen', label_out: 'Buiten', toggle_climate_label: 'Klimaat', toggle_seat_label: 'Stoel', toggle_steering_label: 'Stuur',
@@ -849,6 +861,7 @@ const TRANSLATIONS = {
     panel_nearby_title: 'Κοντινοί σταθμοί φόρτισης', panel_history_title: 'Αυτονομία στο 100% (ιστορικό)',
     btn_wake: 'Αφύπνιση οχήματος', btn_flash: 'Αναβοσβήσιμο φώτων', btn_honk: 'Κόρνα',
     btn_view_location: 'Προβολή τοποθεσίας', msg_no_location: 'Η τοποθεσία δεν είναι διαθέσιμη — ίσως χρειαστεί να αποσυνδεθείς και να συνδεθείς ξανά για να δώσεις πρόσβαση στην τοποθεσία.',
+    msg_location_notice: 'Νέο σε αυτή την έκδοση: μπορείς να δεις την τοποθεσία του οχήματός σου. Αποσυνδέσου και συνδέσου ξανά μία φορά για να δώσεις πρόσβαση.', btn_got_it: 'Το κατάλαβα',
     toggle_windows_label: 'Παράθυρα', state_windows_closed: 'Κλειστά', state_windows_open: 'Ανοιχτά',
     toggle_sentry_label: 'Sentry', toggle_lock_label: 'Κλείδωμα', state_lock_locked: 'Κλειδωμένο', state_lock_unlocked: 'Ξεκλείδωτο',
     label_in: 'Μέσα', label_out: 'Έξω', toggle_climate_label: 'Κλιματισμός', toggle_seat_label: 'Κάθισμα', toggle_steering_label: 'Τιμόνι',
@@ -909,6 +922,7 @@ function trf(key, vars) {
 }
 
 let lastStatusError = null;
+let lastStatusErrorKey = null;
 
 function translateErrorMessage(raw) {
   if (typeof raw !== 'string') return raw;
@@ -920,7 +934,14 @@ function translateErrorMessage(raw) {
 
 function setErrorStatus(raw) {
   lastStatusError = raw;
+  lastStatusErrorKey = null;
   setStatus('❌ ' + translateErrorMessage(raw), 'error');
+}
+
+function setErrorStatusKey(key) {
+  lastStatusErrorKey = key;
+  lastStatusError = null;
+  setStatus('❌ ' + tr(key), 'error');
 }
 
 function applyLanguage(lang) {
@@ -953,8 +974,13 @@ function applyLanguage(lang) {
   if (lastNearbySites) {
     renderNearbySites(lastNearbySites);
   }
-  if (lastStatusError) {
+  if (lastStatusErrorKey) {
+    setStatus('❌ ' + tr(lastStatusErrorKey), 'error');
+  } else if (lastStatusError) {
     setErrorStatus(lastStatusError);
+  }
+  if (locationNoticeVisible) {
+    renderLocationNotice();
   }
 }
 
@@ -1015,6 +1041,34 @@ const toggleState = {};
 let lastVehicleData = null;
 let batteryHistoryHasData = false;
 let lastNearbySites = null;
+let locationNoticeVisible = false;
+
+function checkLocationScope(d) {
+  if (localStorage.getItem('locationNoticeDismissed')) return;
+  if (!d.vehicle_state) return;
+  const hasCoords = d.drive_state && d.drive_state.latitude != null && d.drive_state.longitude != null;
+  if (hasCoords) {
+    localStorage.setItem('locationNoticeDismissed', '1');
+    locationNoticeVisible = false;
+    document.getElementById('locationNotice').style.display = 'none';
+    return;
+  }
+  locationNoticeVisible = true;
+  renderLocationNotice();
+}
+
+function renderLocationNotice() {
+  const banner = document.getElementById('locationNotice');
+  banner.innerHTML = '<span>' + tr('msg_location_notice') + '</span>' +
+    '<button class="notice-dismiss" onclick="dismissLocationNotice()">' + tr('btn_got_it') + '</button>';
+  banner.style.display = 'flex';
+}
+
+function dismissLocationNotice() {
+  localStorage.setItem('locationNoticeDismissed', '1');
+  locationNoticeVisible = false;
+  document.getElementById('locationNotice').style.display = 'none';
+}
 
 function renderToggle(key, isOn) {
   toggleState[key] = isOn;
@@ -1179,6 +1233,7 @@ async function refreshStatus() {
       const d = j.response;
       lastVehicleData = d;
       lastStatusError = null;
+      lastStatusErrorKey = null;
       const battery = d.charge_state ? d.charge_state.battery_level : null;
       const rangeKm = d.charge_state && d.charge_state.battery_range != null ? (d.charge_state.battery_range * 1.60934).toFixed(0) : null;
       document.getElementById('statBattery').textContent = battery != null ? battery + '%' : '–';
@@ -1187,6 +1242,7 @@ async function refreshStatus() {
       updateTempReadout(d.climate_state);
       updateExtraData(d);
       renderVehicleData(d);
+      checkLocationScope(d);
     } else if (j.error) {
       setErrorStatus(j.error);
     } else {
@@ -1429,7 +1485,7 @@ function viewLocation() {
   const lat = drive && drive.latitude;
   const long = drive && drive.longitude;
   if (lat == null || long == null) {
-    setStatus('❌ ' + tr('msg_no_location'), 'error');
+    setErrorStatusKey('msg_no_location');
     return;
   }
   const mapsUrl = `https://maps.google.com/maps?q=${lat},${long}`;
@@ -1449,6 +1505,7 @@ async function checkSoftwareUpdate() {
     if (j.response && j.response.vehicle_state) {
       lastVehicleData = j.response;
       lastStatusError = null;
+      lastStatusErrorKey = null;
       const vs = j.response.vehicle_state;
       document.getElementById('firmwareVersion').textContent = vs.car_version || '–';
       const su = vs.software_update;

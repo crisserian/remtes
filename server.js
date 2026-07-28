@@ -606,12 +606,26 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/status') {
       const { accessToken, vin } = await resolveContext(req);
       const r = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data`, accessToken);
+      let body = r.body;
       try {
-        const json = JSON.parse(r.body);
-        if (json.response) recordBatteryRangeIfFull(json.response.charge_state);
+        const json = JSON.parse(body);
+        if (json.response) {
+          recordBatteryRangeIfFull(json.response.charge_state);
+          // location_data is privacy-gated and NOT included in the default
+          // vehicle_data response even with the vehicle_location scope granted -
+          // Tesla requires it to be requested explicitly via `endpoints`.
+          try {
+            const locRes = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data?endpoints=location_data`, accessToken);
+            const locJson = JSON.parse(locRes.body);
+            if (locJson.response && locJson.response.drive_state) {
+              json.response.drive_state = Object.assign({}, json.response.drive_state, locJson.response.drive_state);
+              body = JSON.stringify(json);
+            }
+          } catch {}
+        }
       } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
-      res.end(r.body);
+      res.end(body);
       return;
     }
 
