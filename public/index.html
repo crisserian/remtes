@@ -1486,6 +1486,11 @@ function viewLocation() {
   const long = drive && drive.longitude;
   if (lat == null || long == null) {
     setErrorStatusKey('msg_no_location');
+    const debug = lastVehicleData && lastVehicleData._locationDebug;
+    if (debug) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent += ' [debug: ' + JSON.stringify(debug).slice(0, 300) + ']';
+    }
     return;
   }
   const mapsUrl = `https://maps.google.com/maps?q=${lat},${long}`;

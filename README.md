@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.4
+- **RO:** Diagnostic: cererea de `location_data` trece acum direct prin API-ul Fleet al Tesla (ca și `navigate_to`), nu prin proxy-ul local de semnare, care probabil nu transmite corect parametrii de query string ai unei cereri GET. Dacă locația tot nu apare, mesajul de eroare afișează acum și răspunsul brut al Tesla, ca să putem identifica exact cauza.
+- **EN:** Diagnostic: the `location_data` request now goes directly through Tesla's Fleet API (like `navigate_to` does), instead of through the local signing proxy, which likely doesn't correctly forward a GET request's query string. If the location still doesn't show up, the error message now also displays Tesla's raw response, so the exact cause can be identified.
+
 ### 1.2.3
 - **RO:** Fix: după logout, apăsarea „Login cu Tesla" redeschidea sesiunea Tesla existentă din browser fără să arate din nou ecranul de login/consimțământ — motiv pentru care userii care se relogau pentru a acorda accesul la locație (scope-ul `vehicle_location` adăugat în 1.2.0) nu primeau de fapt un consimțământ nou. Cererea de autorizare trimite acum `prompt=login`, care forțează Tesla să ceară din nou datele de cont, garantând că noul permis chiar e cerut și acordat.
 - **EN:** Fix: after logging out, pressing "Login with Tesla" reopened the existing Tesla browser session without showing the login/consent screen again — which meant users re-logging in to grant location access (the `vehicle_location` scope added in 1.2.0) weren't actually getting a fresh consent prompt. The authorization request now sends `prompt=login`, forcing Tesla to ask for account credentials again, guaranteeing the new permission is actually requested and granted.

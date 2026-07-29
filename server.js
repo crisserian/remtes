@@ -614,15 +614,23 @@ const server = http.createServer(async (req, res) => {
           recordBatteryRangeIfFull(json.response.charge_state);
           // location_data is privacy-gated and NOT included in the default
           // vehicle_data response even with the vehicle_location scope granted -
-          // Tesla requires it to be requested explicitly via `endpoints`.
+          // Tesla requires it to be requested explicitly via `endpoints`. The
+          // local signing proxy doesn't reliably forward query strings (same
+          // reason navigation_request bypasses it), so this goes straight to
+          // Tesla's Fleet API like navigate_to does.
           try {
-            const locRes = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data?endpoints=location_data`, accessToken);
+            const locRes = await fleetApiRequest('GET', `/api/1/vehicles/${vin}/vehicle_data?endpoints=location_data`, accessToken);
             const locJson = JSON.parse(locRes.body);
             if (locJson.response && locJson.response.drive_state) {
               json.response.drive_state = Object.assign({}, json.response.drive_state, locJson.response.drive_state);
-              body = JSON.stringify(json);
+            } else {
+              json.response._locationDebug = { status: locRes.status, body: locRes.body.slice(0, 500) };
             }
-          } catch {}
+            body = JSON.stringify(json);
+          } catch (locErr) {
+            json.response._locationDebug = { error: String(locErr) };
+            body = JSON.stringify(json);
+          }
         }
       } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
