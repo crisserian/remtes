@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.3
+- **RO:** Fix: după logout, apăsarea „Login cu Tesla" redeschidea sesiunea Tesla existentă din browser fără să arate din nou ecranul de login/consimțământ — motiv pentru care userii care se relogau pentru a acorda accesul la locație (scope-ul `vehicle_location` adăugat în 1.2.0) nu primeau de fapt un consimțământ nou. Cererea de autorizare trimite acum `prompt=login`, care forțează Tesla să ceară din nou datele de cont, garantând că noul permis chiar e cerut și acordat.
+- **EN:** Fix: after logging out, pressing "Login with Tesla" reopened the existing Tesla browser session without showing the login/consent screen again — which meant users re-logging in to grant location access (the `vehicle_location` scope added in 1.2.0) weren't actually getting a fresh consent prompt. The authorization request now sends `prompt=login`, forcing Tesla to ask for account credentials again, guaranteeing the new permission is actually requested and granted.
+
 ### 1.2.2
 - **RO:** Fix: locația mașinii tot nu apărea nici după relogare. Cauza: `location_data` e protejat separat de scope-ul OAuth — Tesla nu-l include implicit în răspunsul `vehicle_data`, chiar dacă scope-ul `vehicle_location` e acordat; trebuie cerut explicit prin parametrul `endpoints`. Serverul local cere acum explicit `location_data` și îl îmbină cu restul datelor mașinii.
 - **EN:** Fix: the vehicle's location still didn't show up even after re-login. Cause: `location_data` is gated separately from the OAuth scope — Tesla doesn't include it by default in the `vehicle_data` response even when the `vehicle_location` scope is granted; it must be requested explicitly via the `endpoints` parameter. The local server now explicitly requests `location_data` and merges it into the rest of the vehicle data.
