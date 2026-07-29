@@ -1482,6 +1482,7 @@ async function viewLocation() {
       const debugParts = [];
       if (j.error) debugParts.push('error=' + j.error);
       else if (j.response) debugParts.push('response=' + JSON.stringify(j.response).slice(0, 300));
+      if (j._grantedScope) debugParts.push('grantedScope=' + j._grantedScope);
       if (debugParts.length) {
         document.getElementById('status').textContent += ' [debug: ' + debugParts.join(', ') + ']';
       }

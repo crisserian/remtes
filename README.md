@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.6
+- **RO:** Diagnostic: scope-ul `vehicle_location` era activat corect în configurația aplicației pe Tesla Developer Portal, dar eroarea „missing scopes vehicle_location" persista chiar și după relogare. Aplicația reține acum scope-ul exact returnat de Tesla în tokenul curent și îl afișează în mesajul de debug la „Vezi locația", ca să vedem clar dacă tokenul chiar conține acest scope sau nu.
+- **EN:** Diagnostic: the `vehicle_location` scope was correctly enabled in the app's Tesla Developer Portal configuration, but the "missing scopes vehicle_location" error persisted even after re-login. The app now stores the exact scope string Tesla returns in the current token and shows it in the "View location" debug message, to see clearly whether the token actually contains this scope or not.
+
 ### 1.2.5
 - **RO:** Fix critic: 1.2.2-1.2.4 adăugaseră o cerere suplimentară către Tesla (pentru locație) la **fiecare** actualizare de status, dublând numărul de apeluri API — asta a dus la limitarea de rată a lui Tesla („Retry in 36 seconds"), care apărea ca „Eroare de rețea" și bloca *tot* ecranul, nu doar locația. Cererea de locație e acum strict la cerere (doar când apeși „Vezi locația", printr-un endpoint separat `/api/location`), nu se mai execută automat la fiecare refresh.
 - **EN:** Critical fix: 1.2.2-1.2.4 had added an extra request to Tesla (for location) on **every** status refresh, doubling the API call volume — this triggered Tesla's rate limiting ("Retry in 36 seconds"), which showed up as a "Network error" and broke the *entire* screen, not just location. The location request is now strictly on-demand (only when you press "View location", via a separate `/api/location` endpoint), no longer running automatically on every refresh.

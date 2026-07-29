@@ -94,6 +94,7 @@ function tokensFromJson(json, previousRefreshToken) {
     access_token: json.access_token,
     refresh_token: json.refresh_token || previousRefreshToken,
     expires_at: Math.floor(Date.now() / 1000) + (json.expires_in || 28800) - 60,
+    scope: json.scope || null,
   };
 }
 
@@ -625,8 +626,19 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/location') {
       const { accessToken, vin } = await resolveContext(req);
       const r = await fleetApiRequest('GET', `/api/1/vehicles/${vin}/vehicle_data?endpoints=location_data`, accessToken);
+      let body = r.body;
+      try {
+        const json = JSON.parse(body);
+        // Surfaces the scope string Tesla actually put in the current access
+        // token (as opposed to what was requested) so a "missing scope"
+        // error can be diagnosed without guessing - see if vehicle_location
+        // is really absent from the granted token or if something else is
+        // wrong.
+        json._grantedScope = loadTokens().scope || '(no scope stored - token predates this field)';
+        body = JSON.stringify(json);
+      } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
-      res.end(r.body);
+      res.end(body);
       return;
     }
 
