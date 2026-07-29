@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.7
+- **RO:** Fix diagnostic: 1.2.6 citea scope-ul din câmpul `scope` al răspunsului de token, dar Tesla nu include deloc acest câmp acolo (opțional conform OAuth2, omis dacă nu diferă de ce s-a cerut) — de-asta mesajul de debug arăta mereu „predates this field", chiar și pe tokenuri proaspete. Acum se decodează direct payload-ul JWT al access tokenului, care conține scope-urile reale acordate.
+- **EN:** Diagnostic fix: 1.2.6 read the scope from the token response's `scope` field, but Tesla doesn't include that field there at all (optional per OAuth2, omitted when unchanged from what was requested) — which is why the debug message always showed "predates this field", even on brand-new tokens. It now decodes the access token's JWT payload directly, which contains the actually-granted scopes.
+
 ### 1.2.6
 - **RO:** Diagnostic: scope-ul `vehicle_location` era activat corect în configurația aplicației pe Tesla Developer Portal, dar eroarea „missing scopes vehicle_location" persista chiar și după relogare. Aplicația reține acum scope-ul exact returnat de Tesla în tokenul curent și îl afișează în mesajul de debug la „Vezi locația", ca să vedem clar dacă tokenul chiar conține acest scope sau nu.
 - **EN:** Diagnostic: the `vehicle_location` scope was correctly enabled in the app's Tesla Developer Portal configuration, but the "missing scopes vehicle_location" error persisted even after re-login. The app now stores the exact scope string Tesla returns in the current token and shows it in the "View location" debug message, to see clearly whether the token actually contains this scope or not.

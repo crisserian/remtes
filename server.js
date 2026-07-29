@@ -21,6 +21,22 @@ try {
 } catch {}
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
+// Tesla's access tokens are JWTs - decoding the payload (no signature check
+// needed, this is only ever used for our own read-only diagnostics) is the
+// only reliable way to see the actually-granted scope, since the token
+// *response* often omits the `scope` field entirely per OAuth2 (RFC 6749
+// 5.1: optional if unchanged from what was requested).
+function decodeJwtPayload(token) {
+  try {
+    const parts = String(token).split('.');
+    if (parts.length < 2) return null;
+    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
 const TOKENS_FILE = path.join(DATA_DIR, 'tokens.json');
 const CLIENT_ID = '750c9467-3412-44de-8853-ff78025f0a2b';
 // Not committed to source control (see .gitignore) - required for the OAuth
@@ -629,12 +645,14 @@ const server = http.createServer(async (req, res) => {
       let body = r.body;
       try {
         const json = JSON.parse(body);
-        // Surfaces the scope string Tesla actually put in the current access
-        // token (as opposed to what was requested) so a "missing scope"
-        // error can be diagnosed without guessing - see if vehicle_location
-        // is really absent from the granted token or if something else is
-        // wrong.
-        json._grantedScope = loadTokens().scope || '(no scope stored - token predates this field)';
+        // Surfaces the scope actually embedded in the current access token
+        // (decoded from the JWT payload, not the token response's `scope`
+        // field, which Tesla appears to omit) so a "missing scope" error can
+        // be diagnosed without guessing - see if vehicle_location is really
+        // absent from the granted token or if something else is wrong.
+        const payload = decodeJwtPayload(loadTokens().access_token);
+        const claimScope = payload && (payload.scp || payload.scope);
+        json._grantedScope = Array.isArray(claimScope) ? claimScope.join(' ') : (claimScope || (payload ? '(no scope claim in token payload: ' + Object.keys(payload).join(',') + ')' : '(access token is not a decodable JWT)'));
         body = JSON.stringify(json);
       } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
