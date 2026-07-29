@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.5
+- **RO:** Fix critic: 1.2.2-1.2.4 adăugaseră o cerere suplimentară către Tesla (pentru locație) la **fiecare** actualizare de status, dublând numărul de apeluri API — asta a dus la limitarea de rată a lui Tesla („Retry in 36 seconds"), care apărea ca „Eroare de rețea" și bloca *tot* ecranul, nu doar locația. Cererea de locație e acum strict la cerere (doar când apeși „Vezi locația", printr-un endpoint separat `/api/location`), nu se mai execută automat la fiecare refresh.
+- **EN:** Critical fix: 1.2.2-1.2.4 had added an extra request to Tesla (for location) on **every** status refresh, doubling the API call volume — this triggered Tesla's rate limiting ("Retry in 36 seconds"), which showed up as a "Network error" and broke the *entire* screen, not just location. The location request is now strictly on-demand (only when you press "View location", via a separate `/api/location` endpoint), no longer running automatically on every refresh.
+
 ### 1.2.4
 - **RO:** Diagnostic: cererea de `location_data` trece acum direct prin API-ul Fleet al Tesla (ca și `navigate_to`), nu prin proxy-ul local de semnare, care probabil nu transmite corect parametrii de query string ai unei cereri GET. Dacă locația tot nu apare, mesajul de eroare afișează acum și răspunsul brut al Tesla, ca să putem identifica exact cauza.
 - **EN:** Diagnostic: the `location_data` request now goes directly through Tesla's Fleet API (like `navigate_to` does), instead of through the local signing proxy, which likely doesn't correctly forward a GET request's query string. If the location still doesn't show up, the error message now also displays Tesla's raw response, so the exact cause can be identified.

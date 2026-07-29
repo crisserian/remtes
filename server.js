@@ -607,34 +607,26 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/status') {
       const { accessToken, vin } = await resolveContext(req);
       const r = await proxyRequest('GET', `/api/1/vehicles/${vin}/vehicle_data`, accessToken);
-      let body = r.body;
       try {
-        const json = JSON.parse(body);
-        if (json.response) {
-          recordBatteryRangeIfFull(json.response.charge_state);
-          // location_data is privacy-gated and NOT included in the default
-          // vehicle_data response even with the vehicle_location scope granted -
-          // Tesla requires it to be requested explicitly via `endpoints`. The
-          // local signing proxy doesn't reliably forward query strings (same
-          // reason navigation_request bypasses it), so this goes straight to
-          // Tesla's Fleet API like navigate_to does.
-          try {
-            const locRes = await fleetApiRequest('GET', `/api/1/vehicles/${vin}/vehicle_data?endpoints=location_data`, accessToken);
-            const locJson = JSON.parse(locRes.body);
-            if (locJson.response && locJson.response.drive_state) {
-              json.response.drive_state = Object.assign({}, json.response.drive_state, locJson.response.drive_state);
-            } else {
-              json.response._locationDebug = { status: locRes.status, body: locRes.body.slice(0, 500) };
-            }
-            body = JSON.stringify(json);
-          } catch (locErr) {
-            json.response._locationDebug = { error: String(locErr) };
-            body = JSON.stringify(json);
-          }
-        }
+        const json = JSON.parse(r.body);
+        if (json.response) recordBatteryRangeIfFull(json.response.charge_state);
       } catch {}
       res.writeHead(r.status, { 'Content-Type': 'application/json' });
-      res.end(body);
+      res.end(r.body);
+      return;
+    }
+
+    // location_data is privacy-gated separately from vehicle_data and must be
+    // requested explicitly via `endpoints` - fetched on demand only (not on
+    // every status poll) to avoid doubling API call volume and tripping
+    // Tesla's rate limiting. Goes straight to the Fleet API like navigate_to
+    // does, since the local signing proxy doesn't reliably forward query
+    // strings on a GET.
+    if (req.method === 'GET' && req.url === '/api/location') {
+      const { accessToken, vin } = await resolveContext(req);
+      const r = await fleetApiRequest('GET', `/api/1/vehicles/${vin}/vehicle_data?endpoints=location_data`, accessToken);
+      res.writeHead(r.status, { 'Content-Type': 'application/json' });
+      res.end(r.body);
       return;
     }
 
