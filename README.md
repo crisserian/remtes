@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.8
+- **RO:** Fix: confirmat prin decodarea JWT-ului (1.2.7) că `vehicle_location` lipsea din tokenul emis, deși e activat în Developer Portal. Cauza probabilă: `prompt=login` doar reautentifică (cere parola din nou), dar nu forțează neapărat un ecran nou de consimțământ pentru un scope adăugat la o aplicație deja autorizată — Tesla poate reemite tokenul cu scope-urile din prima autorizare. Cererea trimite acum `prompt=login consent`. Poate fi nevoie și de revocarea manuală a accesului aplicației din contul Tesla (nu din Developer Portal) pentru un consimțământ cu adevărat nou.
+- **EN:** Fix: confirmed via JWT decoding (1.2.7) that `vehicle_location` was missing from the issued token even though it's enabled in the Developer Portal. Likely cause: `prompt=login` only re-authenticates (asks for the password again) but doesn't necessarily force a fresh consent screen for a scope added to an already-authorized app - Tesla may just reissue a token with the original grant's scopes. The request now sends `prompt=login consent`. Manually revoking the app's access from the Tesla account (not the Developer Portal) may also be needed for a truly fresh consent.
+
 ### 1.2.7
 - **RO:** Fix diagnostic: 1.2.6 citea scope-ul din câmpul `scope` al răspunsului de token, dar Tesla nu include deloc acest câmp acolo (opțional conform OAuth2, omis dacă nu diferă de ce s-a cerut) — de-asta mesajul de debug arăta mereu „predates this field", chiar și pe tokenuri proaspete. Acum se decodează direct payload-ul JWT al access tokenului, care conține scope-urile reale acordate.
 - **EN:** Diagnostic fix: 1.2.6 read the scope from the token response's `scope` field, but Tesla doesn't include that field there at all (optional per OAuth2, omitted when unchanged from what was requested) — which is why the debug message always showed "predates this field", even on brand-new tokens. It now decodes the access token's JWT payload directly, which contains the actually-granted scopes.

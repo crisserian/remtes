@@ -156,7 +156,7 @@ function buildLocalLoginUrl() {
     redirect_uri: OAUTH_REDIRECT_URI,
     response_type: 'code',
     scope: 'openid offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds vehicle_location',
-    prompt: 'login',
+    prompt: 'login consent',
     state,
   }).toString();
 }
