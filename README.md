@@ -163,6 +163,10 @@ npm run dist       # generează installerul NSIS în dist-installer/
 
 ## Version history / Istoric versiuni
 
+### 1.2.9
+- **RO:** Adăugat: contor anonim de utilizare pe server — verificarea de versiune nouă la pornire trece acum prin `ping.php` în loc de `version.txt` direct, care înregistrează doar un număr de porniri pe zi (fără IP, user-agent sau alte date identificabile), vizibil în pagina de statistici.
+- **EN:** Added: anonymous usage counter on the server — the startup version check now goes through `ping.php` instead of `version.txt` directly, which records just a per-day startup tally (no IP, user-agent, or other identifying data), visible on the stats page.
+
 ### 1.2.8
 - **RO:** Fix: confirmat prin decodarea JWT-ului (1.2.7) că `vehicle_location` lipsea din tokenul emis, deși e activat în Developer Portal. Cauza probabilă: `prompt=login` doar reautentifică (cere parola din nou), dar nu forțează neapărat un ecran nou de consimțământ pentru un scope adăugat la o aplicație deja autorizată — Tesla poate reemite tokenul cu scope-urile din prima autorizare. Cererea trimite acum `prompt=login consent`. Poate fi nevoie și de revocarea manuală a accesului aplicației din contul Tesla (nu din Developer Portal) pentru un consimțământ cu adevărat nou.
 - **EN:** Fix: confirmed via JWT decoding (1.2.7) that `vehicle_location` was missing from the issued token even though it's enabled in the Developer Portal. Likely cause: `prompt=login` only re-authenticates (asks for the password again) but doesn't necessarily force a fresh consent screen for a scope added to an already-authorized app - Tesla may just reissue a token with the original grant's scopes. The request now sends `prompt=login consent`. Manually revoking the app's access from the Tesla account (not the Developer Portal) may also be needed for a truly fresh consent.

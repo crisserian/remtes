@@ -1253,7 +1253,7 @@ async function checkForUpdate() {
   try {
     const [localRes, remoteRes] = await Promise.all([
       apiFetch('/api/app-version'),
-      fetch('https://www.grumpylabs.ro/remtes/version.txt', { cache: 'no-store' }),
+      fetch('https://www.grumpylabs.ro/remtes/ping.php', { cache: 'no-store' }),
     ]);
     const local = (await localRes.json()).version;
     const remote = (await remoteRes.text()).trim();

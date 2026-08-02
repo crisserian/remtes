@@ -10,6 +10,8 @@ tokens.json
 .oauth-state.txt
 .last-alert-seen.json
 battery-history.json
+usage_stats.json
+download_count.txt
 *.log
 
 # Build artifacts
@@ -19,6 +21,7 @@ dist-installer/
 # Website/marketing files (grumpylabs.ro deployment, not part of the app)
 stats.php
 download.php
+ping.php
 remtes-htaccess
 remtes-index.php
 facebook-post-draft.md
